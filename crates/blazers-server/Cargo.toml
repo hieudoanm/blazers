@@ -1,0 +1,41 @@
+[package]
+name = "blazers-server"
+description = "Blazers HTTP server: REST API, realtime streams, admin dashboard"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+blazers-core = { path = "../blazers-core" }
+axum = { workspace = true, features = ["ws", "macros"] }
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+deadpool.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+reqwest.workspace = true
+tower-http = { version = "=0.7.1", features = ["cors", "fs", "limit"] }
+tower = "=0.5.3"
+multer = "=3.1.0"
+http-body-util = "=0.1.5"
+infer = "=0.22.0"
+jsonwebtoken = { version = "=11.1.0", features = ["rust_crypto"] }
+bcrypt = "=0.19.3"
+hmac = "=0.13.0"
+sha2 = "=0.11.1"
+hex = "=0.4.3"
+aes-gcm = "=0.11.1"
+rand = "=0.10.3"
+tokio-stream = "=0.1.19"
+cron = "=0.17.0"
+rust-embed = "=8.13.0"
+mime_guess = "=2.0.5"
+image = "=0.25.10"
+futures = "=0.3.34"
+
+[dev-dependencies]
+tempfile = "=3.27.0"
+tokio-tungstenite = "=0.30.0"
