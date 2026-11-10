@@ -1,0 +1,126 @@
+import { marked } from 'marked';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import path from 'node:path';
+
+const DOCS_DIR = path.join(process.cwd(), 'docs');
+const REPO_BLOB = 'https://github.com/hieudoanm/blazers/blob/main';
+// Must match basePath in next.config.ts (GitHub Pages project site).
+// Used in raw HTML hrefs, so basePath is not applied automatically.
+const BASE_PATH = process.env.NODE_ENV === 'production' ? '/blazers' : '';
+
+export interface DocPage {
+  /** URL slug, e.g. "concepts/architecture"; "" for docs/README.md */
+  slug: string;
+  /** Display title from the first `# ` heading */
+  title: string;
+  /** Top-level section: getting-started | concepts | api-reference | guides | "" */
+  section: string;
+  /** Rendered HTML */
+  html: string;
+}
+
+const walk = (dir: string, prefix: string, out: string[]): void => {
+  for (const entry of readdirSync(dir)) {
+    const full = path.join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      walk(full, prefix ? `${prefix}/${entry}` : entry, out);
+    } else if (entry.endsWith('.md')) {
+      out.push(prefix ? `${prefix}/${entry}` : entry);
+    }
+  }
+};
+
+const slugFor = (file: string): string => {
+  return file === 'README.md' ? '' : file.replace(/\.md$/, '');
+};
+
+const titleFor = (markdown: string, file: string): string => {
+  const m = markdown.match(/^#\s+(.+)$/m);
+  return m ? m[1].trim() : file;
+};
+
+/** Resolve a relative `.md` href against the current doc's directory. */
+const resolveHref = (href: string, fromSlug: string): string => {
+  const [filePart, anchor] = href.split('#');
+  const fromDir = fromSlug ? fromSlug.split('/').slice(0, -1) : [];
+  const targetParts = filePart.split('/');
+  const stack = [...fromDir];
+  let escaped = false;
+  for (const part of targetParts) {
+    if (part === '..') {
+      if (stack.length === 0) escaped = true;
+      else stack.pop();
+    } else if (part !== '.' && part !== '') {
+      stack.push(part);
+    }
+  }
+  const suffix = anchor ? `#${anchor}` : '';
+  if (escaped) {
+    // Link escapes the docs tree (e.g. ../../README.md) — point at the repo.
+    const repoPath = targetParts
+      .filter((p) => p !== '..' && p !== '.' && p !== '')
+      .join('/')
+      .replace(/\.md$/, '');
+    return `${REPO_BLOB}/${repoPath}${suffix}`;
+  }
+  const resolved = stack.join('/').replace(/\.md$/, '');
+  const prefix = resolved ? `${BASE_PATH}/docs/${resolved}/` : `${BASE_PATH}/docs/`;
+  return `${prefix}${suffix}`;
+};
+
+const rewriteLinks = (html: string, fromSlug: string): string => {
+  return html.replace(/href="([^"]*?\.md(?:#[^"]*)?)"/g, (_m, href: string) => {
+    return `href="${resolveHref(href, fromSlug)}"`;
+  });
+};
+
+/** GitHub-style heading slug: lowercase, spaces→dashes, drop punctuation. */
+const slugify = (text: string): string => {
+  return text
+    .toLowerCase()
+    .replace(/<[^>]+>/g, '')
+    .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+    .trim()
+    .replace(/[\s_]+/g, '-');
+};
+
+/** Add id attributes to h1–h6 so `#anchor` links resolve. */
+const addHeadingIds = (html: string): string => {
+  const used = new Map<string, number>();
+  return html.replace(/<h([1-6])>([\s\S]*?)<\/h\1>/g, (match, level: string, inner: string) => {
+    let id = slugify(inner);
+    const n = used.get(id) ?? 0;
+    used.set(id, n + 1);
+    if (n > 0) id = `${id}-${n}`;
+    return `<h${level} id="${id}">${inner}</h${level}>`;
+  });
+};
+
+export const getDocPages = (): DocPage[] => {
+  const files: string[] = [];
+  walk(DOCS_DIR, '', files);
+  files.sort();
+  return files.map((file) => {
+    const slug = slugFor(file);
+    const markdown = readFileSync(path.join(DOCS_DIR, file), 'utf8');
+    const raw = marked.parse(markdown, { async: false }) as string;
+    const section = slug.split('/')[0] ?? '';
+    return {
+      slug,
+      title: titleFor(markdown, file),
+      section,
+      html: addHeadingIds(rewriteLinks(raw, slug)),
+    };
+  });
+};
+
+export const DOC_SECTIONS: { id: string; label: string }[] = [
+  { id: 'getting-started', label: 'Getting started' },
+  { id: 'concepts', label: 'Concepts' },
+  { id: 'api-reference', label: 'API reference' },
+  { id: 'guides', label: 'Guides' },
+];
+
+export const sectionLabel = (id: string): string => {
+  return DOC_SECTIONS.find((s) => s.id === id)?.label ?? id;
+};

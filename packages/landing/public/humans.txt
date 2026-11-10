@@ -1,0 +1,13 @@
+/* TEAM */
+Project: blazers — blazing fast Back-end as a Service
+Site: https://hieudoanm.github.io/blazers/
+Source: https://github.com/hieudoanm/blazers
+
+/* SITE */
+Last update: 2026/11/10
+Language: English
+Doctype: HTML5
+User-agent: *
+Allow: /
+
+Sitemap: https://hieudoanm.github.io/blazers/sitemap.xml

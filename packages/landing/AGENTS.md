@@ -1,0 +1,53 @@
+# AGENTS.md — blazers landing page
+
+Guidance for AI agents working on the landing page (`packages/landing`). See
+the root [`AGENTS.md`](../../AGENTS.md) for repository-wide conventions.
+
+## Overview
+
+Next.js 16 (App Router) static-export site + Tailwind CSS v4, deployed to
+GitHub Pages at `https://hieudoanm.github.io/blazers` (project site —
+`basePath: "/blazers"`).
+
+## Layout
+
+- `src/app/page.tsx` — landing page (hero, features, PocketBase comparison,
+  quickstart terminals, CTA, footer)
+- `src/app/docs/[[...slug]]/page.tsx` — docs catch-all; renders every Markdown
+  file under `docs/` as a static page at `/blazers/docs/<path>/`
+- `src/app/globals.css` — Tailwind v4 `@theme` design tokens + `.docs-content`
+  markdown styles + `.btn`/`.terminal` shared components
+- `lib/docs.ts` — Markdown → HTML pipeline (`marked`), relative-link
+  rewriting to `/blazers/docs/*`, GitHub-style heading ids
+- `docs/` — documentation source (moved from the repo-root `docs/`)
+- `public/` — static assets served under `/blazers/`
+- `src/app/icon.svg`, `src/app/favicon.ico` — Next metadata file conventions
+
+## Commands
+
+```sh
+cd packages/landing
+pnpm install
+pnpm run dev     # dev server (basePath applies: /blazers/)
+pnpm run build   # static export → out/ (uploaded to Pages by CI)
+```
+
+## Conventions
+
+- **Keep `output: "export"`** — the site must build to static HTML; no
+  server features, no API routes, no `next/image` optimization.
+- **`basePath`/`assetPrefix` are `/blazers`.** `next/link` and metadata get
+  it automatically; raw `<a href>` and generated HTML links must include it
+  (see `BASE_PATH` in `lib/docs.ts`).
+- **Tailwind v4 tokens** live in `@theme` in `globals.css` — use
+  `bg-bg-alt`, `text-text-muted`, `text-accent`, `border-border`, etc.
+  Accent is flame orange (`--color-accent: #c2410c` family); terminals stay
+  dark (`--color-terminal-*`).
+- **Docs are Markdown**, rendered at build time — no MDX, no client JS.
+  Links between docs use relative `.md` paths; `lib/docs.ts` rewrites them.
+  Links escaping the docs tree (e.g. `../../README.md`) are pointed at the
+  GitHub repo blob.
+- **Pin dependency versions** in `package.json`; CI runs `pnpm install --frozen-lockfile` against
+  `pnpm-lock.yaml` — commit lockfile changes.
+- **Deploy:** CI builds `out/` and uploads via `upload-pages-artifact` +
+  `deploy-pages` (see `.github/workflows/ci.yaml`, `pages` job).

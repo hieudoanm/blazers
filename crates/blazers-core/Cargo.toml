@@ -1,0 +1,16 @@
+[package]
+name = "blazers-core"
+description = "Blazers core: SQLite storage layer, schema migrations and shared models"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+axum.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+deadpool.workspace = true
+uuid.workspace = true
+chrono.workspace = true

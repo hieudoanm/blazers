@@ -1,0 +1,18 @@
+[package]
+name = "blazers-mcp"
+description = "Blazers MCP server: expose collections and records as MCP tools over stdio"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+blazers-core = { path = "../blazers-core" }
+blazers-server = { path = "../blazers-server" }
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+tempfile = "=3.27.0"
