@@ -330,6 +330,7 @@ pub async fn serve_http() {
     .expect("server error");
 }
 
+#[cfg(unix)]
 async fn shutdown_signal() {
     let sigint = async {
         tokio::signal::unix::signal(tokio::signal::unix::SignalKind::interrupt())
@@ -347,6 +348,11 @@ async fn shutdown_signal() {
         _ = sigint => {},
         _ = sigterm => {},
     }
+}
+
+#[cfg(not(unix))]
+async fn shutdown_signal() {
+    let _ = tokio::signal::ctrl_c().await;
 }
 
 #[cfg(test)]

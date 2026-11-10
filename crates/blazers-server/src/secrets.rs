@@ -65,6 +65,7 @@ pub fn webhook_secret_data(secret: &Secret) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(unix)]
     use std::os::unix::fs::PermissionsExt;
     use std::sync::Mutex;
 
@@ -192,6 +193,7 @@ mod tests {
         assert!(result.unwrap_err().contains("decode key file"));
     }
 
+    #[cfg(unix)]
     #[test]
     fn get_or_create_secrets_key_write_failure() {
         let _lock = ENV_LOCK.lock().unwrap();

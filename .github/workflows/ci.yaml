@@ -83,8 +83,8 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v5.0.1
 
-  release:
-    name: Release - binary (${{ matrix.target }})
+  build:
+    name: Build binary (${{ matrix.target }})
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ${{ matrix.os }}
     strategy:
@@ -129,6 +129,25 @@ jobs:
           path: dist/
           retention-days: 7
 
+  publish:
+    name: Publish GitHub Release
+    needs: [build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: blazers-*
+          merge-multiple: true
+
       - name: Delete existing latest release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -138,7 +157,7 @@ jobs:
         uses: softprops/action-gh-release@v3.0.4
         with:
           tag_name: latest
-          name: Latest
+          name: Blazers (latest)
           files: dist/*
           body_path: README.md
           generate_release_notes: true
