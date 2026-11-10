@@ -75,7 +75,7 @@ jobs:
         uses: actions/configure-pages@v6.0.0
 
       - name: Upload landing artifact
-        uses: actions/upload-pages-artifact@v3.0.1
+        uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: packages/landing/out
 
