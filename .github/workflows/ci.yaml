@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.4.0
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -52,16 +52,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.4.0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v4.4.0
         # version comes from packageManager in package.json
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.4.0
         with:
-          node-version: 24
+          node-version: 24.22.2
           cache: pnpm
           cache-dependency-path: packages/landing/pnpm-lock.yaml
 
@@ -74,16 +74,16 @@ jobs:
         run: pnpm run build
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v5.0.0
 
       - name: Upload landing artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
           path: packages/landing/out
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4.0.5
 
   release:
     name: Release - binary (${{ matrix.target }})
@@ -106,7 +106,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.4.0
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -125,7 +125,7 @@ jobs:
           cp README.md "dist/${{ matrix.artifact }}-README.md"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: ${{ matrix.artifact }}
           path: dist/
@@ -133,7 +133,7 @@ jobs:
 
       - name: Publish GitHub Release
         if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.6.2
         with:
           files: dist/*
           body_path: README.md
