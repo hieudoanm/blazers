@@ -1,0 +1,25 @@
+[package]
+name = "blazers"
+description = "Blazers - blazing fast Back-end as a Service in a single binary"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "blazers"
+path = "src/main.rs"
+
+[dependencies]
+blazers-core = { path = "../blazers-core" }
+blazers-server = { path = "../blazers-server" }
+blazers-mcp = { path = "../blazers-mcp" }
+tokio.workspace = true
+
+[build-dependencies]
+chrono.workspace = true
+
+[dev-dependencies]
+reqwest.workspace = true
+serde_json.workspace = true
+uuid.workspace = true

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <!-- flat white background -->
+  <rect width="1280" height="640" fill="#ffffff"/>
+
+  <!-- top right: repo link -->
+  <text x="1200" y="72" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="24" fill="#78716c">github.com/hieudoanm/blazers</text>
+
+  <!-- left: wordmark, vertically centered -->
+  <text x="80" y="288" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="76" font-weight="800" fill="#1c1917" letter-spacing="-2">blazers</text>
+  <text x="82" y="352" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="34" font-weight="500" fill="#57534e">blazing fast Back-end as a Service</text>
+  <text x="82" y="416" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="24" fill="#78716c">One File  ·  SQLite</text>
+
+  <!-- right: terminal card, vertically centered -->
+  <g transform="translate(660,170)">
+    <rect width="560" height="300" rx="18" fill="#020617"/>
+    <circle cx="30" cy="30" r="7" fill="#f87171"/>
+    <circle cx="54" cy="30" r="7" fill="#fbbf24"/>
+    <circle cx="78" cy="30" r="7" fill="#34d399"/>
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="22">
+      <text x="36" y="100" fill="#93c5fd">$ cargo install blazers</text>
+      <text x="36" y="142" fill="#93c5fd">$ blazers</text>
+      <text x="36" y="184" fill="#9ca3af">➜ Local:   </text>
+      <text x="180" y="184" fill="#67e8f9">http://localhost:8080</text>
+      <text x="36" y="226" fill="#9ca3af">➜ Network: </text>
+      <text x="195" y="226" fill="#67e8f9">http://192.168.x.x:8080</text>
+      <text x="36" y="272" fill="#6b7280">dashboard at / · docs at /docs</text>
+    </g>
+  </g>
+</svg>

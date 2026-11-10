@@ -1,0 +1,2523 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blazers Admin</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/client-side-templates.js"></script>
+  <script src="https://unpkg.com/mustache@4.2.0/mustache.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .modal-overlay { display: none; }
+    .modal-overlay.open { display: flex; }
+    .sidebar-link.active { background-color: rgba(255,255,255,0.1); }
+    pre { white-space: pre-wrap; word-break: break-word; }
+  </style>
+</head>
+<body>
+  <!-- ==================== LOGIN VIEW ==================== -->
+  <div id="login-view" class="login-screen">
+    <div class="login-wrap">
+      <div class="login-head">
+        <h1 class="login-title">Blazers</h1>
+        <p class="login-sub">Admin Dashboard</p>
+      </div>
+      <div class="panel login-panel">
+        <h2 class="modal-title modal-title-lg">Sign In</h2>
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="mb-4">
+            <label class="label" for="email">Email</label>
+            <input type="email" id="email" name="email" required
+              class="input input-lg"
+              placeholder="admin@example.com">
+          </div>
+          <div class="mb-6">
+            <label class="label" for="password">Password</label>
+            <input type="password" id="password" name="password" required
+              class="input input-lg"
+              placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;">
+          </div>
+          <div id="login-error" class="form-error hidden"></div>
+          <button type="submit" id="login-btn"
+            class="btn btn-primary btn-block">
+            Sign In
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== APP VIEW ==================== -->
+  <div id="app-view" class="app-shell hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-head">
+        <h1 class="brand-title">Blazers</h1>
+        <p class="brand-sub">Admin Dashboard</p>
+      </div>
+      <nav class="sidebar-nav">
+        <button onclick="showView('dashboard')" class="sidebar-link active" data-view="dashboard">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button onclick="showView('collections')" class="sidebar-link" data-view="collections">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+          <span>Collections</span>
+        </button>
+        <button onclick="showView('buckets')" class="sidebar-link" data-view="buckets">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+          <span>Buckets</span>
+        </button>
+        <button onclick="showView('webhooks')" class="sidebar-link" data-view="webhooks">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+          <span>Webhooks</span>
+        </button>
+        <button onclick="showView('secrets')" class="sidebar-link" data-view="secrets">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+          <span>Secrets</span>
+        </button>
+        <button onclick="showView('websockets')" class="sidebar-link" data-view="websockets">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+          <span>WebSockets</span>
+        </button>
+        <button onclick="showView('cache')" class="sidebar-link" data-view="cache">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          <span>Cache</span>
+        </button>
+        <button onclick="showView('notifications')" class="sidebar-link" data-view="notifications">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span>Notifications</span> <span id="notif-badge" class="badge badge-solid-red ml-auto hidden">0</span>
+        </button>
+        <button onclick="showView('logs')" class="sidebar-link" data-view="logs">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          <span>Logs</span> <span id="log-badge" class="badge badge-solid-yellow ml-auto hidden">0</span>
+        </button>
+        <button onclick="showView('pubsub')" class="sidebar-link" data-view="pubsub">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+          <span>Pub/Sub</span> <span id="pubsub-badge" class="badge badge-solid-purple ml-auto hidden">0</span>
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <button onclick="handleLogout()" class="sidebar-link sidebar-logout">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile header -->
+    <div class="mobile-header">
+      <div class="mobile-header-inner">
+        <h1 class="mobile-brand">Blazers</h1>
+        <button onclick="toggleMobileMenu()" class="icon-btn">
+          <svg class="icon icon-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <main class="main">
+      <!-- Dashboard View -->
+      <div id="view-dashboard" class="view page active">
+        <div class="page-inner">
+          <h2 class="page-title">Dashboard</h2>
+          <div class="grid-2">
+            <div class="panel">
+              <h3 class="modal-title modal-title-mb">Collections</h3>
+              <div id="dash-colls-trigger" hx-get="/api/collections" hx-trigger="dash-ready" hx-ext="client-side-templates"
+                mustache-template="tmpl-dashboard-collections"
+                hx-target="#recent-collections" hx-swap="innerHTML">
+                <div id="recent-collections" class="text-dim text-sm td-loading">Loading...</div>
+              </div>
+            </div>
+            <div class="panel">
+              <h3 class="modal-title modal-title-mb">Buckets</h3>
+              <div id="dash-buckets-trigger" hx-get="/api/buckets" hx-trigger="dash-ready" hx-ext="client-side-templates"
+                mustache-template="tmpl-dashboard-buckets"
+                hx-target="#recent-buckets" hx-swap="innerHTML">
+                <div id="recent-buckets" class="text-dim text-sm td-loading">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collections View -->
+      <div id="view-collections" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <h2 class="page-title">Collections</h2>
+            <button onclick="openModal('create-collection')" class="btn btn-primary btn-sm">
+              + New Collection
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Schema</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="collections-list"
+                  hx-get="/api/collections" hx-trigger="cols-ready" hx-ext="client-side-templates"
+                  mustache-template="tmpl-collections" hx-swap="innerHTML">
+                  <tr><td colspan="4" class="td-empty td-loading">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Records View -->
+      <div id="view-records" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <div>
+              <button onclick="showView('collections')" class="link-muted link-sm">&larr; Collections</button>
+              <h2 class="page-title page-title-mt">Records: <span id="records-collection-name" class="text-accent"></span></h2>
+            </div>
+            <button onclick="openRecordCreateModal()" class="btn btn-primary btn-sm">
+              + New Record
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Data</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="records-list"
+                  hx-ext="client-side-templates" mustache-template="tmpl-records" hx-swap="innerHTML">
+                  <tr><td colspan="4" class="td-empty">Select a collection to view records</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="records-pagination" class="pagination"></div>
+        </div>
+      </div>
+
+      <!-- Buckets View -->
+      <div id="view-buckets" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <h2 class="page-title">Buckets</h2>
+            <button onclick="openModal('create-bucket')" class="btn btn-primary btn-sm">
+              + New Bucket
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Public</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="buckets-list"
+                  hx-get="/api/buckets" hx-trigger="buckets-ready" hx-ext="client-side-templates"
+                  mustache-template="tmpl-buckets" hx-swap="innerHTML">
+                  <tr><td colspan="4" class="td-empty td-loading">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Files View -->
+      <div id="view-files" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <div>
+              <button onclick="showView('buckets')" class="link-muted link-sm">&larr; Buckets</button>
+              <h2 class="page-title page-title-mt">Files: <span id="files-bucket-name" class="text-accent"></span></h2>
+            </div>
+            <button onclick="openFileUploadModal()" class="btn btn-primary btn-sm">
+              + Upload File
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="files-list"
+                  hx-ext="client-side-templates" mustache-template="tmpl-files" hx-swap="innerHTML">
+                  <tr><td colspan="5" class="td-empty">Select a bucket to view files</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="files-pagination" class="pagination"></div>
+        </div>
+      </div>
+
+      <!-- Secrets View -->
+      <div id="view-secrets" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <h2 class="page-title">Secrets</h2>
+            <button onclick="openSecretCreateModal()" class="btn btn-primary btn-sm">
+              + New Secret
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Scope</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="secrets-list"
+                  hx-get="/api/secrets" hx-trigger="secrets-ready" hx-ext="client-side-templates"
+                  mustache-template="tmpl-secrets" hx-swap="innerHTML">
+                  <tr><td colspan="5" class="td-empty td-loading">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webhooks View -->
+      <div id="view-webhooks" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <h2 class="page-title">Webhooks</h2>
+            <button onclick="openWebhookCreateModal()" class="btn btn-primary btn-sm">
+              + New Webhook
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>URL</th>
+                    <th>Events</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="webhooks-list"
+                  hx-get="/api/webhooks" hx-trigger="webhooks-ready" hx-ext="client-side-templates"
+                  mustache-template="tmpl-webhooks" hx-swap="innerHTML">
+                  <tr><td colspan="5" class="td-empty td-loading">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webhook Logs View -->
+      <div id="view-webhook-logs" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <div>
+              <button onclick="showView('webhooks')" class="link-muted link-sm">&larr; Webhooks</button>
+              <h2 class="page-title page-title-mt">Logs: <span id="webhook-logs-name" class="text-accent"></span></h2>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Event</th>
+                    <th>Status</th>
+                    <th>Response</th>
+                    <th>Delivered</th>
+                  </tr>
+                </thead>
+                <tbody id="webhook-logs-list"
+                  hx-ext="client-side-templates" mustache-template="tmpl-webhook-logs" hx-swap="innerHTML">
+                  <tr><td colspan="4" class="td-empty">Select a webhook to view logs</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WebSockets View -->
+      <div id="view-websockets" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <h2 class="page-title">WebSocket Connections</h2>
+            <div class="btn-row">
+              <button onclick="viewAllWSMessages()" class="btn btn-ghost btn-sm">All Messages</button>
+              <button onclick="openModal('modal-ws-broadcast')" class="btn btn-primary btn-sm">Broadcast Message</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Remote Address</th>
+                  <th>Path</th>
+                  <th>User Agent</th>
+                  <th>Status</th>
+                  <th>Connected At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="websockets-list"
+                hx-get="/api/websockets" hx-trigger="websockets-ready" hx-ext="client-side-templates"
+                mustache-template="tmpl-websockets" hx-swap="innerHTML">
+                <tr><td colspan="7" class="td-empty td-loading">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- WebSocket Messages View -->
+      <div id="view-ws-messages" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <div>
+              <button onclick="showView('websockets')" class="link-muted link-sm">&larr; WebSockets</button>
+              <h2 class="page-title page-title-mt">WebSocket Messages</h2>
+              <p class="page-sub" id="ws-messages-header">Connection messages</p>
+            </div>
+          </div>
+          <div class="table-card">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Direction</th>
+                  <th>Content</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="ws-messages-list"
+                hx-ext="client-side-templates" mustache-template="tmpl-ws-messages" hx-swap="innerHTML">
+                <tr><td colspan="3" class="td-empty">Select a connection to view messages</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cache View -->
+      <div id="view-cache" class="view">
+        <div class="pad-6">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Cache</h2>
+              <p class="page-sub">Key-Value Store with TTL</p>
+            </div>
+            <div class="btn-row">
+              <button onclick="openCacheCreateModal()" class="btn btn-primary btn-sm">+ Set Key</button>
+              <button onclick="flushCache()" class="btn btn-danger btn-sm">Flush All</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Value</th>
+                  <th>TTL</th>
+                  <th>Expires</th>
+                  <th>Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="cache-list" hx-get="/api/cache" hx-trigger="cache-ready" hx-ext="client-side-templates" mustache-template="tmpl-cache" hx-swap="innerHTML"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications View -->
+      <div id="view-notifications" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Notifications</h2>
+              <p class="page-sub">Real-time notifications via Server-Sent Events</p>
+            </div>
+            <div class="btn-row">
+              <button onclick="clearAllNotifications()" class="btn btn-danger btn-sm">Clear All</button>
+              <button onclick="openNotifCreateModal()" class="btn btn-primary btn-sm">+ New Notification</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Title</th>
+                  <th>Body</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="notifications-list" hx-get="/api/notifications" hx-trigger="notifications-ready" hx-ext="client-side-templates" mustache-template="tmpl-notifications" hx-swap="innerHTML">
+                <tr><td colspan="6" class="td-empty td-loading">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logs view -->
+      <div id="view-logs" class="view page">
+        <div class="page-header">
+          <h2 class="modal-title">System Logs</h2>
+          <div class="btn-row">
+            <button onclick="clearAllLogs()" class="btn btn-danger btn-sm">Clear All</button>
+          </div>
+        </div>
+        <div class="table-card table-card-dim">
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Level</th>
+                  <th>Message</th>
+                  <th>Meta</th>
+                  <th>Created At</th>
+                </tr>
+              </thead>
+              <tbody id="logs-list" hx-get="/api/logs" hx-trigger="logs-ready" hx-ext="client-side-templates" mustache-template="tmpl-logs" hx-swap="innerHTML">
+                <tr><td colspan="4" class="td-empty td-loading">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PubSub Topics View -->
+      <div id="view-pubsub" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Pub/Sub Topics</h2>
+              <p class="page-sub">Publish and subscribe to real-time message topics</p>
+            </div>
+            <button onclick="openPubSubCreateTopicModal()" class="btn btn-primary btn-sm">+ New Topic</button>
+          </div>
+          <div class="table-card">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="pubsub-topics-list" hx-get="/api/pubsub/topics" hx-trigger="pubsub-ready" hx-ext="client-side-templates" mustache-template="tmpl-pubsub-topics" hx-swap="innerHTML">
+                <tr><td colspan="3" class="td-empty td-loading">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PubSub Topic Detail View -->
+      <div id="view-pubsub-topic" class="view page">
+        <div class="page-inner">
+          <div class="page-header">
+            <div>
+              <button onclick="showView('pubsub')" class="link-muted link-sm">&larr; Topics</button>
+              <h2 class="page-title page-title-mt">Topic: <span id="pubsub-topic-name" class="text-accent"></span></h2>
+              <p class="page-sub">Live stream of messages via Server-Sent Events</p>
+            </div>
+            <button onclick="openPubSubPublishModal()" class="btn btn-primary btn-sm">+ Publish Message</button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Body</th>
+                    <th>Published At</th>
+                  </tr>
+                </thead>
+                <tbody id="pubsub-messages-list"
+                  hx-ext="client-side-templates" mustache-template="tmpl-pubsub-messages" hx-swap="innerHTML">
+                  <tr><td colspan="2" class="td-empty">No messages yet</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+  <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div id="modal-body">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== HTMX TEMPLATES ==================== -->
+
+  <!-- Dashboard Stats -->
+  <script type="x-tmpl-mustache" id="tmpl-dashboard-stats"></script>
+
+  <!-- Dashboard collections recent -->
+  <script type="x-tmpl-mustache" id="tmpl-dashboard-collections">
+    {{#.}}
+    <div class="dash-row">
+      <span class="dash-row-name">{{name}}</span>
+      <span class="dash-row-date">{{created_at}}</span>
+    </div>
+    {{/.}}
+    {{^.}}
+    <div class="empty-note">No collections yet</div>
+    {{/.}}
+  </script>
+
+  <!-- Dashboard buckets recent -->
+  <script type="x-tmpl-mustache" id="tmpl-dashboard-buckets">
+    {{#.}}
+    <div class="dash-row">
+      <span class="dash-row-name">{{name}}</span>
+      <span class="dash-row-date">{{created_at}}</span>
+    </div>
+    {{/.}}
+    {{^.}}
+    <div class="empty-note">No buckets yet</div>
+    {{/.}}
+  </script>
+
+  <!-- Collections list -->
+  <script type="x-tmpl-mustache" id="tmpl-collections">
+    {{#.}}
+    <tr class="row-link">
+      <td>
+        <button onclick="viewCollectionRecords('{{name}}')" class="link-accent link-strong">{{name}}</button>
+      </td>
+      <td class="td-mono-muted w-200 truncate">{{schema}}</td>
+      <td class="td-dim">{{created_at}}</td>
+      <td>
+        <button onclick="deleteCollection('{{name}}')" class="link-danger link-sm">Delete</button>
+      </td>
+    </tr>
+    {{/.}}
+    {{^.}}
+    <tr><td colspan="4" class="td-empty">No collections found</td></tr>
+    {{/.}}
+  </script>
+
+  <!-- Records list -->
+  <script type="x-tmpl-mustache" id="tmpl-records">
+    {{#records}}
+    <tr class="row-link">
+      <td class="td-mono">{{id}}</td>
+      <td class="td-muted w-300"><pre>{{data}}</pre></td>
+      <td class="td-dim">{{created_at}}</td>
+      <td>
+        <button onclick="editRecord('{{id}}')" class="link-accent link-sm mr-3">Edit</button>
+        <button onclick="deleteRecord('{{id}}')" class="link-danger link-sm">Delete</button>
+      </td>
+    </tr>
+    {{/.}}
+    {{^records}}
+    <tr><td colspan="4" class="td-empty">No records found</td></tr>
+    {{/records}}
+  </script>
+
+  <!-- Buckets list -->
+  <script type="x-tmpl-mustache" id="tmpl-buckets">
+    {{#.}}
+    <tr class="row-link">
+      <td>
+        <button onclick="viewBucketFiles('{{name}}')" class="link-accent link-strong">{{name}}</button>
+      </td>
+      <td>
+        {{#is_public}}
+        <span class="badge badge-green">public</span>
+        {{/is_public}}
+        {{^is_public}}
+        <span class="badge badge-gray">private</span>
+        {{/is_public}}
+      </td>
+      <td class="td-dim">{{created_at}}</td>
+      <td>
+        <button onclick="deleteBucket('{{name}}')" class="link-danger link-sm">Delete</button>
+      </td>
+    </tr>
+    {{/.}}
+    {{^.}}
+    <tr><td colspan="4" class="td-empty">No buckets found</td></tr>
+    {{/.}}
+  </script>
+
+  <!-- Files list -->
+  <script type="x-tmpl-mustache" id="tmpl-files">
+    {{#files}}
+    <tr class="row-link">
+      <td class="td-body">{{filename}}</td>
+      <td class="td-dim">{{mime_type}}</td>
+      <td class="td-dim" data-size="{{size}}">{{size}}</td>
+      <td class="td-dim">{{created_at}}</td>
+      <td>
+        <button onclick="downloadFile('{{bucket}}','{{id}}','{{filename}}')" class="link-accent link-sm mr-3">Download</button>
+        <button onclick="deleteFile('{{bucket}}','{{id}}')" class="link-danger link-sm">Delete</button>
+      </td>
+    </tr>
+    {{/.}}
+    {{^files}}
+    <tr><td colspan="5" class="td-empty">No files found</td></tr>
+    {{/files}}
+  </script>
+
+  <!-- Secrets list -->
+  <script type="x-tmpl-mustache" id="tmpl-secrets">
+    {{#.}}
+    <tr class="row-link">
+      <td class="td-strong">{{name}}</td>
+      <td class="td-muted">{{scope}}</td>
+      <td class="td-dim">{{created_at}}</td>
+      <td class="td-dim">{{updated_at}}</td>
+      <td>
+        <button onclick="showSecretValue('{{id}}','{{name}}')" class="link-accent link-sm mr-3">Show</button>
+        <button onclick="editSecret('{{id}}')" class="link-accent link-sm mr-3">Edit</button>
+        <button onclick="deleteSecret('{{id}}','{{name}}')" class="link-danger link-sm">Delete</button>
+      </td>
+    </tr>
+    {{/.}}
+    {{^.}}
+    <tr><td colspan="5" class="td-empty">No secrets configured</td></tr>
+    {{/.}}
+  </script>
+
+  <!-- Webhooks list -->
+  <script type="x-tmpl-mustache" id="tmpl-webhooks">
+    {{#.}}
+    <tr class="row-link">
+      <td class="td-strong">{{name}}</td>
+      <td class="td-mono-muted w-200 truncate">{{url}}</td>
+      <td class="td-muted">
+        {{#events}}
+        <span class="tag">{{.}}</span>
+        {{/events}}
+      </td>
+      <td>
+        {{#is_active}}
+        <span class="badge badge-green">active</span>
+        {{/is_active}}
+        {{^is_active}}
+        <span class="badge badge-gray">inactive</span>
+        {{/is_active}}
+      </td>
+      <td>
+        <button onclick="viewWebhookLogs('{{id}}','{{name}}')" class="link-accent link-sm mr-3">Logs</button>
+        <button onclick="editWebhook('{{id}}')" class="link-accent link-sm mr-3">Edit</button>
+        <button onclick="deleteWebhook('{{id}}','{{name}}')" class="link-danger link-sm">Delete</button>
+      </td>
+    </tr>
+    {{/.}}
+    {{^.}}
+    <tr><td colspan="5" class="td-empty">No webhooks configured</td></tr>
+    {{/.}}
+  </script>
+
+  <!-- Webhook Logs list -->
+  <script type="x-tmpl-mustache" id="tmpl-webhook-logs">
+    {{#.}}
+    <tr class="row-link">
+      <td class="td-mono">{{event}}</td>
+      <td>
+        <span class="badge" data-wh-status>{{status}}</span>
+      </td>
+      <td class="td-mono-muted">
+        {{#response_status}}{{response_status}}{{/response_status}}
+        {{^response_status}}<span class="text-faint">—</span>{{/response_status}}
+        {{#error}}<span class="text-danger text-xs"> {{error}}</span>{{/error}}
+      </td>
+      <td class="td-dim">{{created_at}}</td>
+    </tr>
+    {{/.}}
+    {{^.}}
+    <tr><td colspan="4" class="td-empty">No delivery logs yet</td></tr>
+    {{/.}}
+  </script>
+
+  <!-- WebSockets list -->
+  <script type="x-tmpl-mustache" id="tmpl-websockets">
+    {{#.}}
+    <tr class="row-link">
+      <td class="td-mono">{{id}}</td>
+      <td class="td-muted">{{remote_addr}}</td>
+      <td class="td-muted">{{path}}</td>
+      <td class="td-muted w-150 truncate">{{user_agent}}</td>
+      <td class="td-sm">{{#is_active}}<span class="text-success">Active</span>{{/is_active}}{{^is_active}}<span class="text-danger">Inactive</span>{{/is_active}}</td>
+      <td class="td-dim">{{connected_at}}</td>
+      <td class="td-sm">
+        <button onclick="viewWSMessages('{{id}}')" class="link-accent mr-3">Messages</button>
+        {{#is_active}}<button onclick="openWSSendModal('{{id}}')" class="link-accent mr-3">Send</button>{{/is_active}}
+        <button onclick="deleteWSConnection('{{id}}')" class="icon-btn-sm icon-danger" title="Delete"><svg class="icon icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+      </td>
+    </tr>
+    {{/.}}
+    {{^.}}
+    <tr><td colspan="7" class="td-empty">No WebSocket connections</td></tr>
+    {{/.}}
+  </script>
+
+  <!-- WebSocket Messages list -->
+  <script type="x-tmpl-mustache" id="tmpl-ws-messages">
+    {{#.}}
+    <tr class="row-link">
+      <td class="td-sm">{{direction}}</td>
+      <td class="td-mono w-md truncate">{{content}}</td>
+      <td class="td-dim">{{created_at}}</td>
+    </tr>
+    {{/.}}
+    {{^.}}
+    <tr><td colspan="3" class="td-empty">No messages yet</td></tr>
+    {{/.}}
+  </script>
+
+  <!-- Cache list -->
+  <script type="x-tmpl-mustache" id="tmpl-cache">
+{{#.}}
+<tr class="row">
+  <td class="td-mono-accent">{{key}}</td>
+  <td class="td-mono w-xs truncate">{{value}}</td>
+  <td class="td-sm">{{#ttl}}{{ttl}}s{{/ttl}}{{^ttl}}<span class="text-dim">∞</span>{{/ttl}}</td>
+  <td class="td-muted">{{#expires_at}}{{expires_at}}{{/expires_at}}{{^expires_at}}<span class="text-dim">-</span>{{/expires_at}}</td>
+  <td class="td-dim">{{updated_at}}</td>
+  <td class="td-sm">
+    <button onclick="editCacheEntry('{{key}}')" class="icon-btn-sm icon-accent" title="Edit"><svg class="icon icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+    <button onclick="deleteCacheEntry('{{key}}')" class="icon-btn-sm icon-danger" title="Delete"><svg class="icon icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+  </td>
+</tr>
+{{/.}}
+{{^.}}
+<tr><td colspan="6" class="td-empty">No cache entries</td></tr>
+{{/.}}
+</script>
+
+  <script type="x-tmpl-mustache" id="tmpl-notifications">
+{{#.}}
+<tr class="row">
+  <td class="td-sm">{{type}}</td>
+  <td class="td-strong">{{title}}</td>
+  <td class="td-muted w-xs truncate">{{body}}</td>
+  <td class="td-sm">{{#is_read}}<span class="text-dim">Read</span>{{/is_read}}{{^is_read}}<span class="text-warning">New</span>{{/is_read}}</td>
+  <td class="td-dim">{{created_at}}</td>
+  <td class="td-sm">
+    {{^is_read}}<button onclick="markNotifRead('{{id}}')" class="link-accent mr-2">Read</button>{{/is_read}}
+    <button onclick="deleteNotification('{{id}}')" class="icon-btn-sm icon-danger" title="Delete"><svg class="icon icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+  </td>
+</tr>
+{{/.}}
+{{^.}}
+<tr><td colspan="6" class="td-empty">No notifications</td></tr>
+{{/.}}
+</script>
+
+<!-- Logs list -->
+<script type="x-tmpl-mustache" id="tmpl-logs">
+{{#.}}
+<tr class="row">
+  <td class="td-sm log-level-cell" data-level="{{level}}">{{level}}</td>
+  <td class="td-mono w-md truncate">{{message}}</td>
+  <td class="td-muted w-xs truncate">{{meta}}</td>
+  <td class="td-dim">{{created_at}}</td>
+</tr>
+{{/.}}
+{{^.}}
+<tr><td colspan="4" class="td-empty">No logs</td></tr>
+{{/.}}
+</script>
+
+<script type="x-tmpl-mustache" id="tmpl-pubsub-topics">
+{{#.}}
+<tr class="row">
+  <td>
+    <button onclick="viewPubSubTopic('{{name}}')" class="link-accent link-strong">{{name}}</button>
+  </td>
+  <td class="td-dim">{{created_at}}</td>
+  <td class="td-sm">
+    <button onclick="deletePubSubTopic('{{name}}')" class="link-danger">Delete</button>
+  </td>
+</tr>
+{{/.}}
+{{^.}}
+<tr><td colspan="3" class="td-empty">No topics created yet</td></tr>
+{{/.}}
+</script>
+
+<script type="x-tmpl-mustache" id="tmpl-pubsub-messages">
+{{#.}}
+<tr class="row">
+  <td class="td-mono w-lg truncate">{{body}}</td>
+  <td class="td-dim">{{created_at}}</td>
+</tr>
+{{/.}}
+{{^.}}
+<tr><td colspan="2" class="td-empty">No messages yet</td></tr>
+{{/.}}
+</script>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // ---- Auth ----
+    const TOKEN_KEY = 'blazers_token';
+
+    function getToken() {
+      return localStorage.getItem(TOKEN_KEY);
+    }
+
+    function setToken(token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    }
+
+    function clearToken() {
+      localStorage.removeItem(TOKEN_KEY);
+    }
+
+    // Auto-add auth header to all HTMX requests
+    document.addEventListener('htmx:configRequest', (e) => {
+      const token = getToken();
+      if (token) {
+        e.detail.headers['Authorization'] = 'Bearer ' + token;
+      }
+    });
+
+    // Redirect to login on 401
+    document.addEventListener('htmx:responseError', (e) => {
+      if (e.detail.xhr.status === 401 && getToken()) {
+        clearToken();
+        showLogin();
+      }
+    });
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('login-btn');
+      const errEl = document.getElementById('login-error');
+
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      errEl.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+        setToken(data.token);
+        showApp();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    }
+
+    function handleLogout() {
+      clearToken();
+      showLogin();
+    }
+
+    // ---- Navigation ----
+    function showLogin() {
+      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('app-view').classList.add('hidden');
+    }
+
+    function showApp() {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('app-view').classList.remove('hidden');
+      loadDashboard();
+      showView('dashboard');
+      startNotifStream();
+      startLogStream();
+    }
+
+    function loadDashboard() {
+      document.getElementById('dash-colls-trigger').dispatchEvent(new Event('dash-ready'));
+      document.getElementById('dash-buckets-trigger').dispatchEvent(new Event('dash-ready'));
+    }
+
+    function showView(view) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + view).classList.add('active');
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.sidebar-link[data-view="${view}"]`);
+      if (link) link.classList.add('active');
+      if (view === 'collections') {
+        document.getElementById('collections-list').dispatchEvent(new Event('cols-ready'));
+      } else if (view === 'buckets') {
+        document.getElementById('buckets-list').dispatchEvent(new Event('buckets-ready'));
+      } else if (view === 'dashboard') {
+        loadDashboard();
+      } else if (view === 'webhooks') {
+        document.getElementById('webhooks-list').dispatchEvent(new Event('webhooks-ready'));
+      } else if (view === 'secrets') {
+        document.getElementById('secrets-list').dispatchEvent(new Event('secrets-ready'));
+      } else if (view === 'websockets') {
+        document.getElementById('websockets-list').dispatchEvent(new Event('websockets-ready'));
+      } else if (view === 'cache') {
+        document.getElementById('cache-list').dispatchEvent(new Event('cache-ready'));
+      } else if (view === 'notifications') {
+        document.getElementById('notifications-list').dispatchEvent(new Event('notifications-ready'));
+      } else if (view === 'logs') {
+        document.getElementById('logs-list').dispatchEvent(new Event('logs-ready'));
+      } else if (view === 'pubsub') {
+        document.getElementById('pubsub-topics-list').dispatchEvent(new Event('pubsub-ready'));
+      }
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('sidebar').classList.toggle('hidden');
+      document.getElementById('sidebar').classList.toggle('flex');
+    }
+
+    // Check auth on load
+    if (getToken()) {
+      showApp();
+    }
+
+    // ---- Modal ----
+    function openModal(contentId) {
+      const overlay = document.getElementById('modal-overlay');
+      const body = document.getElementById('modal-body');
+      body.innerHTML = document.getElementById(contentId).innerHTML;
+      overlay.classList.add('open');
+    }
+
+    function closeModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      document.getElementById('modal-overlay').classList.remove('open');
+    }
+
+    // Close on escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.getElementById('modal-overlay').classList.remove('open');
+      }
+    });
+
+    // ---- Collections ----
+    async function deleteCollection(name) {
+      if (!confirm('Delete collection "' + name + '" and all its records?')) return;
+      try {
+        const res = await fetch('/api/collections/' + encodeURIComponent(name), {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Delete failed');
+        }
+        htmx.trigger('#collections-list', 'cols-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function createCollection(event) {
+      event.preventDefault();
+      const form = event.target;
+      const data = Object.fromEntries(new FormData(form));
+      try {
+        const res = await fetch('/api/collections', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Create failed');
+        closeModal(null);
+        htmx.trigger('#collections-list', 'cols-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ---- Records ----
+    let currentCollection = '';
+    let currentRecordsPage = 1;
+
+    function viewCollectionRecords(name) {
+      currentCollection = name;
+      currentRecordsPage = 1;
+      document.getElementById('records-collection-name').textContent = name;
+      loadRecords();
+      showView('records');
+    }
+
+    function loadRecords() {
+      const tbody = document.getElementById('records-list');
+      tbody.setAttribute('hx-get', '/api/collections/' + encodeURIComponent(currentCollection) + '/records?page=' + currentRecordsPage + '&per_page=20');
+      htmx.trigger(tbody, 'load');
+      // Also handle pagination via after swap
+    }
+
+    // HTMX swap handler for records to update pagination
+    document.addEventListener('htmx:afterSwap', (e) => {
+      if (e.detail.target.id === 'records-list') {
+        updateRecordsPagination();
+      }
+      if (e.detail.target.id === 'files-list') {
+        updateFilesPagination();
+        e.detail.target.querySelectorAll('td[data-size]').forEach(td => {
+          td.textContent = formatSize(parseInt(td.dataset.size, 10) || 0);
+        });
+      }
+      if (e.detail.target.id === 'webhook-logs-list') {
+        e.detail.target.querySelectorAll('[data-wh-status]').forEach(el => {
+          const s = el.textContent.trim();
+          el.className = 'badge ' + (s === 'success' ? 'badge-green' : s === 'failure' ? 'badge-red' : 'badge-gray');
+        });
+      }
+      if (e.detail.target.id === 'notifications-list') {
+        const rows = e.detail.target.querySelectorAll('tr');
+        rows.forEach(row => {
+          const typeCell = row.querySelector('td:first-child');
+          if (typeCell) {
+            const type = typeCell.textContent.trim();
+            typeCell.innerHTML = renderNotifType(type);
+          }
+        });
+      }
+      if (e.detail.target.id === 'logs-list') {
+        const rows = e.detail.target.querySelectorAll('tr');
+        rows.forEach(row => {
+          const levelCell = row.querySelector('.log-level-cell');
+          if (levelCell) {
+            const level = levelCell.dataset.level || levelCell.textContent.trim();
+            const map = {debug: 'DEBUG', info: 'INFO', warn: 'WARN', error: 'ERROR'};
+            const colors = {debug: 'lvl-debug', info: 'lvl-info', warn: 'lvl-warn', error: 'lvl-error'};
+            levelCell.textContent = map[level] || level;
+            levelCell.className = `td-sm log-level-cell ${colors[level] || 'lvl-debug'}`;
+          }
+        });
+      }
+    });
+
+    function updateRecordsPagination() {
+      // We store pagination data via a temporary approach: read from the API response
+      // Since HTMX with client-side-templates renders the content, we need to track the page.
+      // Use a blazer approach: re-fetch with HTMX but handle pagination manually.
+      renderRecordsPagination();
+    }
+
+    function renderRecordsPagination() {
+      const el = document.getElementById('records-pagination');
+      el.innerHTML = `
+        <span class="text-muted">Page ${currentRecordsPage}</span>
+        <div class="btn-row-sm">
+          <button onclick="prevRecordsPage()" class="btn btn-ghost btn-xs${currentRecordsPage <= 1 ? ' is-disabled' : ''}" ${currentRecordsPage <= 1 ? 'disabled' : ''}>Prev</button>
+          <button onclick="nextRecordsPage()" class="btn btn-ghost btn-xs">Next</button>
+        </div>
+      `;
+    }
+
+    function prevRecordsPage() {
+      if (currentRecordsPage > 1) {
+        currentRecordsPage--;
+        loadRecords();
+      }
+    }
+
+    function nextRecordsPage() {
+      currentRecordsPage++;
+      loadRecords();
+    }
+
+    async function createRecord(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      let data;
+      try {
+        data = JSON.parse(formData.get('data'));
+      } catch (e) {
+        alert('Invalid JSON data');
+        return;
+      }
+      try {
+        const res = await fetch('/api/collections/' + encodeURIComponent(currentCollection) + '/records', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify({ data })
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Create failed');
+        closeModal(null);
+        loadRecords();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function deleteRecord(id) {
+      if (!confirm('Delete record ' + id.substring(0, 8) + '...?')) return;
+      try {
+        const res = await fetch('/api/collections/' + encodeURIComponent(currentCollection) + '/records/' + encodeURIComponent(id), {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Delete failed');
+        }
+        loadRecords();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function openRecordCreateModal() {
+      openModal('modal-create-record');
+    }
+
+    async function editRecord(id) {
+      try {
+        const res = await fetch('/api/collections/' + encodeURIComponent(currentCollection) + '/records/' + encodeURIComponent(id), {
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        const record = await res.json();
+        if (!res.ok) throw new Error(record.error || 'Fetch failed');
+        openModal('modal-edit-prefill');
+        document.getElementById('edit-record-id').value = record.id;
+        document.getElementById('edit-record-data').value = JSON.stringify(JSON.parse(record.data), null, 2);
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function updateRecord(event) {
+      event.preventDefault();
+      const form = event.target;
+      const id = form.querySelector('[name="id"]').value;
+      let data;
+      try {
+        data = JSON.parse(form.querySelector('[name="data"]').value);
+      } catch (e) {
+        alert('Invalid JSON data');
+        return;
+      }
+      try {
+        const res = await fetch('/api/collections/' + encodeURIComponent(currentCollection) + '/records/' + encodeURIComponent(id), {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify({ data })
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Update failed');
+        closeModal(null);
+        loadRecords();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ---- Buckets ----
+    async function deleteBucket(name) {
+      if (!confirm('Delete bucket "' + name + '" and all its files?')) return;
+      try {
+        const res = await fetch('/api/buckets/' + encodeURIComponent(name), {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Delete failed');
+        }
+        htmx.trigger('#buckets-list', 'buckets-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function createBucket(event) {
+      event.preventDefault();
+      const form = event.target;
+      const data = Object.fromEntries(new FormData(form));
+      data.is_public = data.is_public === 'on';
+      try {
+        const res = await fetch('/api/buckets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Create failed');
+        closeModal(null);
+        htmx.trigger('#buckets-list', 'buckets-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ---- Files ----
+    let currentBucket = '';
+    let currentFilesPage = 1;
+
+    function viewBucketFiles(name) {
+      currentBucket = name;
+      currentFilesPage = 1;
+      document.getElementById('files-bucket-name').textContent = name;
+      loadFiles();
+      showView('files');
+    }
+
+    function loadFiles() {
+      const tbody = document.getElementById('files-list');
+      tbody.setAttribute('hx-get', '/api/buckets/' + encodeURIComponent(currentBucket) + '/files?page=' + currentFilesPage + '&per_page=20');
+      htmx.trigger(tbody, 'load');
+    }
+
+    function updateFilesPagination() {
+      const el = document.getElementById('files-pagination');
+      el.innerHTML = `
+        <span class="text-muted">Page ${currentFilesPage}</span>
+        <div class="btn-row-sm">
+          <button onclick="prevFilesPage()" class="btn btn-ghost btn-xs${currentFilesPage <= 1 ? ' is-disabled' : ''}" ${currentFilesPage <= 1 ? 'disabled' : ''}>Prev</button>
+          <button onclick="nextFilesPage()" class="btn btn-ghost btn-xs">Next</button>
+        </div>
+      `;
+    }
+
+    function prevFilesPage() {
+      if (currentFilesPage > 1) {
+        currentFilesPage--;
+        loadFiles();
+      }
+    }
+
+    function nextFilesPage() {
+      currentFilesPage++;
+      loadFiles();
+    }
+
+    function formatSize(bytes) {
+      if (!bytes) return '0 B';
+      const units = ['B', 'KB', 'MB', 'GB'];
+      let i = 0;
+      let size = bytes;
+      while (size >= 1024 && i < units.length - 1) {
+        size /= 1024;
+        i++;
+      }
+      return size.toFixed(i > 0 ? 1 : 0) + ' ' + units[i];
+    }
+
+    function openFileUploadModal() {
+      openModal('modal-upload-file');
+    }
+
+    async function uploadFile(event) {
+      event.preventDefault();
+      const form = event.target;
+      const fileInput = form.querySelector('[type="file"]');
+      const file = fileInput.files[0];
+      if (!file) { alert('Please select a file'); return; }
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        const res = await fetch('/api/buckets/' + encodeURIComponent(currentBucket) + '/files', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + getToken() },
+          body: fd
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Upload failed');
+        closeModal(null);
+        loadFiles();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function downloadFile(bucket, id, filename) {
+      const a = document.createElement('a');
+      a.href = '/api/buckets/' + encodeURIComponent(bucket) + '/files/' + encodeURIComponent(id);
+      a.download = filename;
+      a.style.display = 'none';
+      fetch(a.href, {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+      }).then(res => {
+        if (!res.ok) throw new Error('Download failed');
+        return res.blob();
+      }).then(blob => {
+        a.href = URL.createObjectURL(blob);
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }).catch(err => alert('Error: ' + err.message));
+    }
+
+    async function deleteFile(bucket, id) {
+      if (!confirm('Delete this file?')) return;
+      try {
+        const res = await fetch('/api/buckets/' + encodeURIComponent(bucket) + '/files/' + encodeURIComponent(id), {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Delete failed');
+        }
+        loadFiles();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ---- Webhooks ----
+    let currentWebhookID = '';
+    let currentWebhookName = '';
+
+    function openWebhookCreateModal() {
+      openModal('modal-create-webhook');
+    }
+
+    async function createWebhook(event) {
+      event.preventDefault();
+      const form = event.target;
+      const fd = new FormData(form);
+      const data = {
+        name: fd.get('name'),
+        url: fd.get('url'),
+        secret: fd.get('secret'),
+        events: fd.getAll('events')
+      };
+      if (data.events.length === 0) { alert('Select at least one event'); return; }
+      try {
+        const res = await fetch('/api/webhooks', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Create failed');
+        closeModal(null);
+        htmx.trigger('#webhooks-list', 'webhooks-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function viewWebhookLogs(id, name) {
+      currentWebhookID = id;
+      currentWebhookName = name;
+      document.getElementById('webhook-logs-name').textContent = name;
+      const tbody = document.getElementById('webhook-logs-list');
+      tbody.setAttribute('hx-get', '/api/webhooks/' + encodeURIComponent(id) + '/logs');
+      htmx.trigger(tbody, 'load');
+      showView('webhook-logs');
+    }
+
+    async function editWebhook(id) {
+      try {
+        const res = await fetch('/api/webhooks/' + encodeURIComponent(id), {
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        const hook = await res.json();
+        if (!res.ok) throw new Error(hook.error || 'Fetch failed');
+        openModal('modal-edit-webhook');
+        document.getElementById('edit-webhook-id').value = hook.id;
+        document.getElementById('edit-webhook-name').value = hook.name;
+        document.getElementById('edit-webhook-url').value = hook.url;
+        document.getElementById('edit-webhook-secret').value = hook.secret || '';
+        document.getElementById('edit-webhook-active').checked = hook.is_active;
+        document.querySelectorAll('#modal-edit-webhook input[name="edit-events"]').forEach(cb => {
+          cb.checked = hook.events && hook.events.includes(cb.value);
+        });
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function updateWebhook(event) {
+      event.preventDefault();
+      const form = event.target;
+      const id = form.querySelector('[name="id"]').value;
+      const events = [];
+      form.querySelectorAll('input[name="edit-events"]:checked').forEach(cb => events.push(cb.value));
+      const data = {
+        name: form.querySelector('[name="name"]').value,
+        url: form.querySelector('[name="url"]').value,
+        secret: form.querySelector('[name="secret"]').value,
+        is_active: form.querySelector('[name="is_active"]').checked,
+        events: events
+      };
+      if (data.name === '' || data.url === '') { alert('Name and URL are required'); return; }
+      try {
+        const res = await fetch('/api/webhooks/' + encodeURIComponent(id), {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Update failed');
+        closeModal(null);
+        htmx.trigger('#webhooks-list', 'webhooks-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function deleteWebhook(id, name) {
+      if (!confirm('Delete webhook "' + name + '"?')) return;
+      try {
+        const res = await fetch('/api/webhooks/' + encodeURIComponent(id), {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Delete failed');
+        }
+        htmx.trigger('#webhooks-list', 'webhooks-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ---- Secrets ----
+    function openSecretCreateModal() {
+      openModal('modal-create-secret');
+    }
+
+    async function createSecret(event) {
+      event.preventDefault();
+      const form = event.target;
+      const fd = new FormData(form);
+      const data = {
+        name: fd.get('name'),
+        value: fd.get('value'),
+        scope: fd.get('scope') || 'general'
+      };
+      if (!data.name || !data.value) { alert('Name and value are required'); return; }
+      try {
+        const res = await fetch('/api/secrets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Create failed');
+        closeModal(null);
+        htmx.trigger('#secrets-list', 'secrets-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function editSecret(id) {
+      try {
+        const res = await fetch('/api/secrets/' + encodeURIComponent(id), {
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        const secret = await res.json();
+        if (!res.ok) throw new Error(secret.error || 'Fetch failed');
+        openModal('modal-edit-secret');
+        document.getElementById('edit-secret-id').value = secret.id;
+        document.getElementById('edit-secret-name').value = secret.name;
+        document.getElementById('edit-secret-value').value = '';
+        document.getElementById('edit-secret-scope').value = secret.scope || 'general';
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function updateSecret(event) {
+      event.preventDefault();
+      const form = event.target;
+      const id = form.querySelector('[name="id"]').value;
+      const data = {
+        name: form.querySelector('[name="name"]').value,
+        value: form.querySelector('[name="value"]').value,
+        scope: form.querySelector('[name="scope"]').value || 'general'
+      };
+      if (!data.name) { alert('Name is required'); return; }
+      try {
+        const res = await fetch('/api/secrets/' + encodeURIComponent(id), {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Update failed');
+        closeModal(null);
+        htmx.trigger('#secrets-list', 'secrets-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function deleteSecret(id, name) {
+      if (!confirm('Delete secret "' + name + '"?')) return;
+      try {
+        const res = await fetch('/api/secrets/' + encodeURIComponent(id), {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Delete failed');
+        }
+        htmx.trigger('#secrets-list', 'secrets-ready');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function showSecretValue(id, name) {
+      try {
+        const res = await fetch('/api/secrets/' + encodeURIComponent(id), {
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        const secret = await res.json();
+        if (!res.ok) throw new Error(secret.error || 'Fetch failed');
+        openModal('modal-show-secret');
+        document.getElementById('show-secret-name').textContent = name;
+        document.getElementById('show-secret-value').textContent = secret.value;
+        document.getElementById('show-secret-scope').textContent = secret.scope || 'general';
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ---- WebSockets ----
+    let currentWSConnectionId = '';
+
+    function loadWebSockets() {
+      showView('websockets');
+      document.getElementById('websockets-list').dispatchEvent(new Event('websockets-ready'));
+    }
+
+    function viewWSMessages(id) {
+      currentWSConnectionId = id;
+      document.getElementById('ws-messages-header').textContent = 'Messages for connection ' + id;
+      document.getElementById('ws-messages-list').setAttribute('hx-get', '/api/websockets/' + id + '/messages');
+      document.getElementById('ws-messages-list').dispatchEvent(new Event('load'));
+      showView('ws-messages');
+    }
+
+    function viewAllWSMessages() {
+      document.getElementById('ws-messages-header').textContent = 'All WebSocket Messages';
+      document.getElementById('ws-messages-list').setAttribute('hx-get', '/api/websockets/messages');
+      document.getElementById('ws-messages-list').dispatchEvent(new Event('load'));
+      showView('ws-messages');
+    }
+
+    function openWSSendModal(id) {
+      document.getElementById('ws-send-id').value = id;
+      document.getElementById('ws-send-target').textContent = id;
+      openModal('modal-ws-send');
+    }
+
+    function broadcastWSMessage(event) {
+      event.preventDefault();
+      const form = event.target;
+      const fd = new FormData(form);
+      fetch('/api/websockets/broadcast', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken()},
+        body: JSON.stringify({content: fd.get('content')})
+      }).then(r => r.json()).then(() => {
+        closeModal(null);
+        loadWebSockets();
+      }).catch(err => alert('Error: ' + err.message));
+    }
+
+    function sendWSMessage(event) {
+      event.preventDefault();
+      const form = event.target;
+      const fd = new FormData(form);
+      const id = fd.get('connection_id');
+      fetch('/api/websockets/' + id + '/send', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken()},
+        body: JSON.stringify({content: fd.get('content')})
+      }).then(r => r.json()).then(() => {
+        closeModal(null);
+      }).catch(err => alert('Error: ' + err.message));
+    }
+
+    function deleteWSConnection(id) {
+      if (!confirm('Disconnect this WebSocket connection?')) return;
+      fetch('/api/websockets/' + id, {
+        method: 'DELETE',
+        headers: {'Authorization': 'Bearer ' + getToken()}
+      }).then(() => {
+        document.getElementById('websockets-list').dispatchEvent(new Event('websockets-ready'));
+      }).catch(err => alert('Error: ' + err.message));
+    }
+
+    // Handle HTMX error for pagination (when we go past last page, reset)
+    document.addEventListener('htmx:beforeSwap', (e) => {
+      if (e.detail.xhr.status === 404 || e.detail.xhr.status === 500) {
+        // Don't swap if error
+        if (e.detail.target.id === 'records-list' && currentRecordsPage > 1) {
+          currentRecordsPage--;
+        }
+        if (e.detail.target.id === 'files-list' && currentFilesPage > 1) {
+          currentFilesPage--;
+        }
+      }
+    });
+
+    // ---- Cache ----
+    function openCacheCreateModal() {
+      document.getElementById('cache-key-input').value = '';
+      document.getElementById('cache-value-input').value = '';
+      document.getElementById('cache-ttl-input').value = '0';
+      openModal('modal-create-cache');
+    }
+
+    function setCacheEntry(event) {
+      event.preventDefault();
+      const fd = new FormData(event.target);
+      fetch('/api/cache', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken()},
+        body: JSON.stringify({key: fd.get('key'), value: fd.get('value'), ttl: parseInt(fd.get('ttl')) || 0})
+      }).then(r => r.json()).then(() => {
+        closeModal(null);
+        document.getElementById('cache-list').dispatchEvent(new Event('cache-ready'));
+      }).catch(err => alert('Error: ' + err.message));
+    }
+
+    function editCacheEntry(key) {
+      fetch('/api/cache/' + encodeURIComponent(key), {
+        headers: {'Authorization': 'Bearer ' + getToken()}
+      }).then(r => r.json()).then(entry => {
+        document.getElementById('cache-edit-key-display').textContent = key;
+        document.getElementById('cache-edit-key-input').value = key;
+        document.getElementById('cache-edit-value-input').value = entry.value;
+        document.getElementById('cache-edit-ttl-input').value = entry.ttl || 0;
+        openModal('modal-edit-cache');
+      }).catch(err => alert('Error: ' + err.message));
+    }
+
+    function updateCacheEntry(event) {
+      event.preventDefault();
+      const fd = new FormData(event.target);
+      fetch('/api/cache', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken()},
+        body: JSON.stringify({key: fd.get('key'), value: fd.get('value'), ttl: parseInt(fd.get('ttl')) || 0})
+      }).then(r => r.json()).then(() => {
+        closeModal(null);
+        document.getElementById('cache-list').dispatchEvent(new Event('cache-ready'));
+      }).catch(err => alert('Error: ' + err.message));
+    }
+
+    function deleteCacheEntry(key) {
+      if (!confirm('Delete cache key "' + key + '"?')) return;
+      fetch('/api/cache/' + encodeURIComponent(key), {
+        method: 'DELETE',
+        headers: {'Authorization': 'Bearer ' + getToken()}
+      }).then(() => {
+        document.getElementById('cache-list').dispatchEvent(new Event('cache-ready'));
+      }).catch(err => alert('Error: ' + err.message));
+    }
+
+    function flushCache() {
+      if (!confirm('Delete ALL cache entries?')) return;
+      fetch('/api/cache', {
+        method: 'DELETE',
+        headers: {'Authorization': 'Bearer ' + getToken()}
+      }).then(() => {
+        document.getElementById('cache-list').dispatchEvent(new Event('cache-ready'));
+      }).catch(err => alert('Error: ' + err.message));
+    }
+
+    // ---- Notifications ----
+    let notifStream = null;
+
+    function startNotifStream() {
+      const token = getToken();
+      if (!token) return;
+      if (notifStream) notifStream.close();
+      notifStream = new EventSource('/api/notifications/stream');
+      notifStream.onmessage = function(e) {
+        try {
+          const notif = JSON.parse(e.data);
+          const badge = document.getElementById('notif-badge');
+          if (badge) {
+            const count = parseInt(badge.textContent || '0');
+            badge.textContent = count + 1;
+            badge.classList.remove('hidden');
+          }
+          loadNotifications();
+        } catch(err) {}
+      };
+      notifStream.onerror = function() {
+        setTimeout(startNotifStream, 3000);
+      };
+    }
+
+    function renderNotifType(type) {
+      const map = {info: ['badge-blue', 'Info'], success: ['badge-green', 'Success'], warning: ['badge-yellow', 'Warning'], error: ['badge-red', 'Error']};
+      const [cls, label] = map[type] || ['badge-gray', type];
+      return `<span class="badge ${cls}">${label}</span>`;
+    }
+
+    function loadNotifications() {
+      const tbody = document.getElementById('notifications-list');
+      if (tbody) htmx.trigger(tbody, 'notifications-ready');
+    }
+
+    function openNotifCreateModal() {
+      openModal('modal-create-notification');
+    }
+
+    async function createNotification(event) {
+      event.preventDefault();
+      const form = event.target;
+      const data = Object.fromEntries(new FormData(form));
+      try {
+        const res = await fetch('/api/notifications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Create failed');
+        closeModal(null);
+        loadNotifications();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function markNotifRead(id) {
+      try {
+        const res = await fetch('/api/notifications/' + encodeURIComponent(id), {
+          method: 'PATCH',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Mark read failed');
+        }
+        loadNotifications();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function deleteNotification(id) {
+      if (!confirm('Delete this notification?')) return;
+      try {
+        const res = await fetch('/api/notifications/' + encodeURIComponent(id), {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Delete failed');
+        }
+        loadNotifications();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function clearAllNotifications() {
+      if (!confirm('Delete all notifications?')) return;
+      try {
+        const res = await fetch('/api/notifications', {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Clear failed');
+        document.getElementById('notif-badge').classList.add('hidden');
+        loadNotifications();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ---- Logs SSE + CRUD ----
+    let logEventSource = null;
+
+    function startLogStream() {
+      if (logEventSource) logEventSource.close();
+      logEventSource = new EventSource('/api/logs/stream');
+      logEventSource.onmessage = () => {
+        if (document.getElementById('view-logs').classList.contains('active')) {
+          document.getElementById('logs-list').dispatchEvent(new Event('logs-ready'));
+        }
+      };
+      logEventSource.onerror = () => {
+        logEventSource.close();
+        setTimeout(startLogStream, 3000);
+      };
+    }
+
+    async function clearAllLogs() {
+      if (!confirm('Delete ALL logs?')) return;
+      try {
+        const res = await fetch('/api/logs', {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Clear failed');
+        document.getElementById('logs-list').dispatchEvent(new Event('logs-ready'));
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ---- PubSub ----
+    let pubsubEventSources = {};
+
+    function loadPubSubTopics() {
+      htmx.trigger('#pubsub-topics-list', 'pubsub-ready');
+    }
+
+    function viewPubSubTopic(name) {
+      document.getElementById('pubsub-topic-name').textContent = name;
+      const tbody = document.getElementById('pubsub-messages-list');
+      tbody.setAttribute('hx-get', '/api/pubsub/topics/' + encodeURIComponent(name) + '/messages');
+      htmx.trigger(tbody, 'load');
+      showView('pubsub-topic');
+      startPubSubStream(name);
+    }
+
+    function startPubSubStream(name) {
+      if (pubsubEventSources[name]) pubsubEventSources[name].close();
+      const es = new EventSource('/api/pubsub/' + encodeURIComponent(name) + '/stream');
+      pubsubEventSources[name] = es;
+      es.onmessage = function(e) {
+        try {
+          const msg = JSON.parse(e.data);
+          const tbody = document.getElementById('pubsub-messages-list');
+          if (tbody && document.getElementById('view-pubsub-topic').classList.contains('active')) {
+            htmx.trigger(tbody, 'load');
+          }
+          const badge = document.getElementById('pubsub-badge');
+          if (badge) {
+            const count = parseInt(badge.textContent || '0');
+            badge.textContent = count + 1;
+            badge.classList.remove('hidden');
+          }
+        } catch(err) {}
+      };
+      es.onerror = function() {
+        es.close();
+        setTimeout(() => startPubSubStream(name), 3000);
+      };
+    }
+
+    function openPubSubCreateTopicModal() {
+      openModal('modal-create-pubsub-topic');
+    }
+
+    async function createPubSubTopic(event) {
+      event.preventDefault();
+      const form = event.target;
+      const data = Object.fromEntries(new FormData(form));
+      if (!data.name) { alert('Topic name is required'); return; }
+      try {
+        const res = await fetch('/api/pubsub/topics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Create failed');
+        closeModal(null);
+        loadPubSubTopics();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function deletePubSubTopic(name) {
+      if (!confirm('Delete topic "' + name + '" and all its messages?')) return;
+      try {
+        const res = await fetch('/api/pubsub/topics/' + encodeURIComponent(name), {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Delete failed');
+        }
+        loadPubSubTopics();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function openPubSubPublishModal() {
+      openModal('modal-publish-pubsub-message');
+    }
+
+    async function publishPubSubMessage(event) {
+      event.preventDefault();
+      const form = event.target;
+      const fd = new FormData(form);
+      const name = document.getElementById('pubsub-topic-name').textContent;
+      const data = { body: fd.get('body') };
+      if (!data.body) { alert('Message body is required'); return; }
+      try {
+        const res = await fetch('/api/pubsub/topics/' + encodeURIComponent(name) + '/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Publish failed');
+        closeModal(null);
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+  </script>
+
+  <!-- ==================== MODAL TEMPLATES ==================== -->
+
+  <!-- Create Collection Modal -->
+  <template id="modal-create-collection">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Create Collection</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="createCollection(event)">
+        <div class="mb-4">
+          <label class="label">Name</label>
+          <input type="text" name="name" required
+            class="input"
+            placeholder="my_collection">
+        </div>
+        <div class="mb-6">
+          <label class="label">Schema (JSON)</label>
+          <textarea name="schema" rows="4"
+            class="input input-mono"
+            placeholder='{"title": "string", "count": "number"}'>{}</textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-plain btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Create</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Create Record Modal -->
+  <template id="modal-create-record">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Create Record</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="createRecord(event)">
+        <div class="mb-6">
+          <label class="label">Data (JSON)</label>
+          <textarea name="data" rows="8" required
+            class="input input-mono"
+            placeholder='{"key": "value"}'>{}</textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-plain btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Create</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Edit Record Modal -->
+  <template id="modal-edit-prefill">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Edit Record</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="updateRecord(event)">
+        <input type="hidden" name="id" id="edit-record-id">
+        <div class="mb-6">
+          <label class="label">Data (JSON)</label>
+          <textarea name="data" id="edit-record-data" rows="8" required
+            class="input input-mono"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-plain btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Create Bucket Modal -->
+  <template id="modal-create-bucket">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Create Bucket</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="createBucket(event)">
+        <div class="mb-4">
+          <label class="label">Name</label>
+          <input type="text" name="name" required
+            class="input"
+            placeholder="my_bucket">
+        </div>
+        <div class="mb-6">
+          <label class="check-label check-label-lg">
+            <input type="checkbox" name="is_public" class="check check-lg">
+            Public bucket
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-plain btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Create</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Upload File Modal -->
+  <template id="modal-upload-file">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Upload File</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="uploadFile(event)">
+        <div class="mb-6">
+          <label class="label">Select file</label>
+          <input type="file" name="file" required
+            class="input input-file">
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-plain btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Upload</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Create Webhook Modal -->
+  <template id="modal-create-webhook">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Create Webhook</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="createWebhook(event)">
+        <div class="mb-4">
+          <label class="label">Name</label>
+          <input type="text" name="name" required
+            class="input"
+            placeholder="My Webhook">
+        </div>
+        <div class="mb-4">
+          <label class="label">URL</label>
+          <input type="url" name="url" required
+            class="input"
+            placeholder="https://example.com/webhook">
+        </div>
+        <div class="mb-4">
+          <label class="label">Secret (optional, for HMAC signing)</label>
+          <input type="text" name="secret"
+            class="input"
+            placeholder="my-signing-secret">
+        </div>
+        <div class="mb-6">
+          <label class="label">Events</label>
+          <div class="check-grid">
+            <label class="check-label"><input type="checkbox" name="events" value="record.create" class="check"> record.create</label>
+            <label class="check-label"><input type="checkbox" name="events" value="record.update" class="check"> record.update</label>
+            <label class="check-label"><input type="checkbox" name="events" value="record.delete" class="check"> record.delete</label>
+            <label class="check-label"><input type="checkbox" name="events" value="collection.create" class="check"> collection.create</label>
+            <label class="check-label"><input type="checkbox" name="events" value="collection.delete" class="check"> collection.delete</label>
+            <label class="check-label"><input type="checkbox" name="events" value="bucket.create" class="check"> bucket.create</label>
+            <label class="check-label"><input type="checkbox" name="events" value="bucket.delete" class="check"> bucket.delete</label>
+            <label class="check-label"><input type="checkbox" name="events" value="pubsub.topic.create" class="check"> pubsub.topic.create</label>
+            <label class="check-label"><input type="checkbox" name="events" value="pubsub.topic.delete" class="check"> pubsub.topic.delete</label>
+            <label class="check-label"><input type="checkbox" name="events" value="pubsub.message.create" class="check"> pubsub.message.create</label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-plain btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Create</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Show Secret Modal -->
+  <template id="modal-show-secret">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Secret: <span id="show-secret-name" class="text-accent"></span></h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <div class="mb-4">
+        <label class="label">Scope</label>
+        <p id="show-secret-scope" class="text-muted text-sm"></p>
+      </div>
+      <div class="mb-6">
+        <label class="label">Value</label>
+        <pre id="show-secret-value" class="secret-value"></pre>
+      </div>
+      <div class="form-actions">
+        <button type="button" onclick="closeModal(null)" class="btn btn-secondary btn-sm">Close</button>
+      </div>
+    </div>
+  </template>
+
+  <!-- Create Secret Modal -->
+  <template id="modal-create-secret">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Create Secret</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="createSecret(event)">
+        <div class="mb-4">
+          <label class="label">Name</label>
+          <input type="text" name="name" required
+            class="input"
+            placeholder="DATABASE_URL">
+        </div>
+        <div class="mb-4">
+          <label class="label">Value</label>
+          <textarea name="value" rows="4" required
+            class="input input-mono"
+            placeholder="postgresql://user:pass@localhost:5432/db"></textarea>
+        </div>
+        <div class="mb-6">
+          <label class="label">Scope</label>
+          <input type="text" name="scope"
+            class="input"
+            placeholder="general">
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-plain btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Create</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Edit Secret Modal -->
+  <template id="modal-edit-secret">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Edit Secret</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="updateSecret(event)">
+        <input type="hidden" name="id" id="edit-secret-id">
+        <div class="mb-4">
+          <label class="label">Name</label>
+          <input type="text" name="name" id="edit-secret-name" required
+            class="input">
+        </div>
+        <div class="mb-4">
+          <label class="label">Value (leave empty to keep current)</label>
+          <textarea name="value" id="edit-secret-value" rows="4"
+            class="input input-mono"
+            placeholder="Leave empty to keep current value"></textarea>
+        </div>
+        <div class="mb-6">
+          <label class="label">Scope</label>
+          <input type="text" name="scope" id="edit-secret-scope"
+            class="input">
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-plain btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Edit Webhook Modal -->
+  <template id="modal-edit-webhook">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Edit Webhook</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="updateWebhook(event)">
+        <input type="hidden" name="id" id="edit-webhook-id">
+        <div class="mb-4">
+          <label class="label">Name</label>
+          <input type="text" name="name" id="edit-webhook-name" required
+            class="input">
+        </div>
+        <div class="mb-4">
+          <label class="label">URL</label>
+          <input type="url" name="url" id="edit-webhook-url" required
+            class="input">
+        </div>
+        <div class="mb-4">
+          <label class="label">Secret</label>
+          <input type="text" name="secret" id="edit-webhook-secret"
+            class="input">
+        </div>
+        <div class="mb-4">
+          <label class="check-label check-label-lg">
+            <input type="checkbox" name="is_active" id="edit-webhook-active" class="check check-lg">
+            Active
+          </label>
+        </div>
+        <div class="mb-6">
+          <label class="label">Events</label>
+          <div class="check-grid">
+            <label class="check-label"><input type="checkbox" name="edit-events" value="record.create" class="check"> record.create</label>
+            <label class="check-label"><input type="checkbox" name="edit-events" value="record.update" class="check"> record.update</label>
+            <label class="check-label"><input type="checkbox" name="edit-events" value="record.delete" class="check"> record.delete</label>
+            <label class="check-label"><input type="checkbox" name="edit-events" value="collection.create" class="check"> collection.create</label>
+            <label class="check-label"><input type="checkbox" name="edit-events" value="collection.delete" class="check"> collection.delete</label>
+            <label class="check-label"><input type="checkbox" name="edit-events" value="bucket.create" class="check"> bucket.create</label>
+            <label class="check-label"><input type="checkbox" name="edit-events" value="bucket.delete" class="check"> bucket.delete</label>
+            <label class="check-label"><input type="checkbox" name="edit-events" value="pubsub.topic.create" class="check"> pubsub.topic.create</label>
+            <label class="check-label"><input type="checkbox" name="edit-events" value="pubsub.topic.delete" class="check"> pubsub.topic.delete</label>
+            <label class="check-label"><input type="checkbox" name="edit-events" value="pubsub.message.create" class="check"> pubsub.message.create</label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-plain btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Broadcast Message Modal -->
+  <template id="modal-ws-broadcast">
+    <div class="pad-6">
+      <h3 class="modal-title modal-title-mb">Broadcast Message</h3>
+      <form onsubmit="broadcastWSMessage(event)">
+        <div class="mb-4">
+          <label class="label">Message</label>
+          <textarea name="content" rows="3" required class="input input-lg" placeholder="Enter message to broadcast to all connections"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-ghost btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Broadcast</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Send Message Modal -->
+  <template id="modal-ws-send">
+    <div class="pad-6">
+      <h3 class="modal-title modal-title-mb">Send Message to <span id="ws-send-target" class="text-accent"></span></h3>
+      <form onsubmit="sendWSMessage(event)">
+        <input type="hidden" name="connection_id" id="ws-send-id">
+        <div class="mb-4">
+          <label class="label">Message</label>
+          <textarea name="content" rows="3" required class="input input-lg" placeholder="Enter message to send"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-ghost btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Send</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Create Cache Entry Modal -->
+  <template id="modal-create-cache">
+    <div class="pad-6">
+      <h3 class="modal-title modal-title-mb">Set Cache Key</h3>
+      <form onsubmit="setCacheEntry(event)">
+        <div class="mb-4">
+          <label class="label">Key</label>
+          <input type="text" name="key" id="cache-key-input" required
+            class="input input-lg"
+            placeholder="my-key">
+        </div>
+        <div class="mb-4">
+          <label class="label">Value</label>
+          <textarea name="value" id="cache-value-input" rows="2" required
+            class="input input-lg"
+            placeholder="my-value"></textarea>
+        </div>
+        <div class="mb-4">
+          <label class="label">TTL (seconds, 0 = no expiry)</label>
+          <input type="number" name="ttl" id="cache-ttl-input" value="0" min="0"
+            class="input input-lg">
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-ghost btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Edit Cache Entry Modal -->
+  <template id="modal-edit-cache">
+    <div class="pad-6">
+      <h3 class="modal-title modal-title-mb">Edit Cache Entry: <span id="cache-edit-key-display" class="text-accent"></span></h3>
+      <form onsubmit="updateCacheEntry(event)">
+        <input type="hidden" name="key" id="cache-edit-key-input">
+        <div class="mb-4">
+          <label class="label">Value</label>
+          <textarea name="value" id="cache-edit-value-input" rows="2" required
+            class="input input-lg"></textarea>
+        </div>
+        <div class="mb-4">
+          <label class="label">TTL (seconds, 0 = no expiry)</label>
+          <input type="number" name="ttl" id="cache-edit-ttl-input" value="0" min="0"
+            class="input input-lg">
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-ghost btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Update</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <script type="x-tmpl-mustache" id="modal-create-notification">
+      <h3 class="modal-title modal-title-mb">Create Notification</h3>
+      <form onsubmit="createNotification(event)" class="pad-6 form-stack">
+        <div>
+          <label class="label">Title</label>
+          <input type="text" name="title" required placeholder="e.g. Server Maintenance"
+            class="input input-lg">
+        </div>
+        <div>
+          <label class="label">Body</label>
+          <textarea name="body" rows="3" placeholder="Notification details..."
+            class="input input-lg"></textarea>
+        </div>
+        <div>
+          <label class="label">Type</label>
+          <select name="type"
+            class="input input-lg">
+            <option value="info">Info</option>
+            <option value="success">Success</option>
+            <option value="warning">Warning</option>
+            <option value="error">Error</option>
+          </select>
+        </div>
+        <div class="form-actions pt-2">
+          <button type="button" onclick="closeModal(null)" class="btn btn-ghost btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Create</button>
+        </div>
+      </form>
+  </script>
+
+  <!-- Create PubSub Topic Modal -->
+  <template id="modal-create-pubsub-topic">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Create Pub/Sub Topic</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="createPubSubTopic(event)">
+        <div class="mb-6">
+          <label class="label">Topic Name</label>
+          <input type="text" name="name" required placeholder="e.g. chat.room1"
+            class="input input-lg">
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-ghost btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Create</button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <!-- Publish PubSub Message Modal -->
+  <template id="modal-publish-pubsub-message">
+    <div class="pad-6">
+      <div class="page-header">
+        <h3 class="modal-title">Publish Message</h3>
+        <button onclick="closeModal(null)" class="link-muted">&times;</button>
+      </div>
+      <form onsubmit="publishPubSubMessage(event)">
+        <div class="mb-6">
+          <label class="label">Message Body</label>
+          <textarea name="body" rows="4" required placeholder="Enter message content..."
+            class="input input-lg"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal(null)" class="btn btn-ghost btn-sm">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Publish</button>
+        </div>
+      </form>
+    </div>
+  </template>
+</body>
+</html>
