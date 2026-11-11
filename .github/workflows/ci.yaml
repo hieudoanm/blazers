@@ -79,7 +79,7 @@ jobs:
         uses: actions/configure-pages@v6.0.0
 
       - name: Delete stale Pages artifacts
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data } = await github.rest.actions.listWorkflowRunArtifacts({
