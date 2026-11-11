@@ -132,18 +132,24 @@ async fn handle_socket_sends_message_to_client() {
     let msg = Message::Text("from server".into());
     send_to_client(&ws_hub, &client_id, msg).await;
 
-    // Verify the message was received on the WebSocket connection
-    tokio::time::sleep(Duration::from_millis(200)).await;
+    // Verify the message was received on the WebSocket connection. The server
+    // pings on an interval, so skip control frames until the text arrives.
+    use tokio::time::timeout;
     use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
-    let received = ws_stream
-        .next()
-        .await
-        .expect("should receive a message")
-        .expect("message should be ok");
-    match received {
-        TungsteniteMessage::Text(t) => assert_eq!(t, "from server"),
-        other => panic!("expected text message, got: {other:?}"),
-    }
+    let received = timeout(Duration::from_secs(5), async {
+        loop {
+            match ws_stream.next().await {
+                Some(Ok(TungsteniteMessage::Text(t))) => break t,
+                Some(Ok(TungsteniteMessage::Ping(_) | TungsteniteMessage::Pong(_))) => continue,
+                Some(Ok(other)) => panic!("expected text message, got: {other:?}"),
+                Some(Err(err)) => panic!("websocket error: {err}"),
+                None => panic!("websocket closed before message arrived"),
+            }
+        }
+    })
+    .await
+    .expect("timed out waiting for message");
+    assert_eq!(received, "from server");
 
     ws_stream.close(None).await.unwrap();
     tokio::time::sleep(Duration::from_millis(200)).await;
