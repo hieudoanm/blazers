@@ -12,6 +12,10 @@ no external services: everything persists to one SQLite file.
 </p>
 
 <p align="center">
+  [![CI](https://github.com/hieudoanm/blazers/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/hieudoanm/blazers/actions/workflows/ci.yaml?branch=master)  [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+</p>
+
+<p align="center">
   Inspired by <a href="https://pocketbase.io/">PocketBase</a> and
   <a href="https://supabase.com/">Supabase</a>, rebuilt as a Cargo workspace.
 </p>
