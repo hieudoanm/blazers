@@ -50,6 +50,7 @@ jobs:
       contents: read
       pages: write
       id-token: write
+      actions: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
@@ -76,6 +77,23 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v6.0.0
+
+      - name: Delete stale Pages artifacts
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+            for (const artifact of data.artifacts.filter((a) => a.name === "github-pages" && !a.expired)) {
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id,
+              });
+            }
 
       - name: Upload landing artifact
         uses: actions/upload-pages-artifact@v5.0.0
