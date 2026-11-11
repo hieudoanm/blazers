@@ -69,6 +69,18 @@ jobs:
         working-directory: packages/landing
         run: pnpm install --frozen-lockfile
 
+      - name: Typecheck landing
+        working-directory: packages/landing
+        run: pnpm run typecheck
+
+      - name: Lint landing
+        working-directory: packages/landing
+        run: pnpm run lint
+
+      - name: Test landing
+        working-directory: packages/landing
+        run: pnpm run test
+
       - name: Build landing (Next.js static export)
         working-directory: packages/landing
         run: pnpm run build
