@@ -17,9 +17,9 @@ export const metadata: Metadata = {
     description:
       'Auth, database, files, realtime, webhooks, cron, secrets and an MCP server — one Rust binary, one SQLite file.',
     url: 'https://hieudoanm.github.io/blazers/',
-    images: ['/og.svg'],
+    images: ['/og.png'],
   },
-  twitter: { card: 'summary_large_image', images: ['/og.svg'] },
+  twitter: { card: 'summary_large_image', images: ['/og.png'] },
 };
 
 interface RootLayoutProps {
