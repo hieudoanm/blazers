@@ -34,6 +34,8 @@ pnpm run build   # static export → out/ (uploaded to Pages by CI)
 
 ## Conventions
 
+- **Fonts:** Inter (sans) via `next/font` (`--font-inter`) or the Google Fonts link in `index.html`; mono stack `ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace`. Tokens: `--font-sans` / `--font-mono`. Do not add other typefaces.
+
 - **Keep `output: "export"`** — the site must build to static HTML; no
   server features, no API routes, no `next/image` optimization.
 - **`basePath`/`assetPrefix` are `/blazers`.** `next/link` and metadata get
