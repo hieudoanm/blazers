@@ -1,24 +1,19 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/hieudoanm/blazers/master/assets/branding/png/logo.png" width="128" alt="blazers">
-</p>
+# blazers
 
-<h1 align="center">Blazers</h1>
+[![CI](https://github.com/hieudoanm/blazers/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/hieudoanm/blazers/actions/workflows/ci.yaml?branch=master)  [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<p align="center">
-  <strong>Blazing fast Back-end as a Service</strong> — a single Rust binary that gives you
+
+**Blazing fast Back-end as a Service** — a single Rust binary that gives you
 auth, a dynamic database, file storage, realtime, webhooks, cron jobs,
 encrypted secrets, pub/sub, an admin dashboard and an MCP server. No Docker,
 no external services: everything persists to one SQLite file.
-</p>
 
 <p align="center">
-  [![CI](https://github.com/hieudoanm/blazers/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/hieudoanm/blazers/actions/workflows/ci.yaml?branch=master)  [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+  <img src="assets/branding/png/og.png" alt="blazers — a blazing fast Back-end as a Service" width="720">
 </p>
 
-<p align="center">
-  Inspired by <a href="https://pocketbase.io/">PocketBase</a> and
-  <a href="https://supabase.com/">Supabase</a>, rebuilt as a Cargo workspace.
-</p>
+Inspired by [PocketBase](https://pocketbase.io/) and
+[Supabase](https://supabase.com/), rebuilt as a Cargo workspace.
 
 ## Features
 
@@ -45,7 +40,7 @@ Full documentation lives at [`/docs`](https://hieudoanm.github.io/blazers/docs/)
 landing site (source: [`packages/landing/docs/`](packages/landing/docs/README.md)) —
 concepts, API reference, and deployment guides.
 
-## Quick start
+## Get Started
 
 ```bash
 cargo build --release
@@ -151,4 +146,4 @@ rate limiting, and a built-in MCP server.
 
 ## License
 
-MIT — see `LICENSE` in each crate.
+This project is licensed under the [MIT License](LICENSE).
