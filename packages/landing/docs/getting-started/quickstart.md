@@ -20,7 +20,12 @@ curl -X POST http://localhost:8080/api/auth/register \
 Response — just the user record (register does **not** return a token):
 
 ```json
-{ "id": "...", "email": "admin@example.com", "created_at": "...", "updated_at": "..." }
+{
+  "id": "...",
+  "email": "admin@example.com",
+  "created_at": "...",
+  "updated_at": "..."
+}
 ```
 
 Now log in to get a token:
@@ -35,7 +40,12 @@ Response:
 
 ```json
 {
-  "user": { "id": "...", "email": "admin@example.com", "created_at": "...", "updated_at": "..." },
+  "user": {
+    "id": "...",
+    "email": "admin@example.com",
+    "created_at": "...",
+    "updated_at": "..."
+  },
   "token": "eyJhbGciOi..."
 }
 ```
@@ -47,8 +57,8 @@ AUTH="Authorization: Bearer $TOKEN"
 
 ## 3. Create a collection
 
-A collection is a table. Its `schema` maps field names to types; append `?`
-to a field name to make it optional.
+A collection is a table. Its `schema` maps field names to types; append `?` to a
+field name to make it optional.
 
 ```sh
 curl -X POST http://localhost:8080/api/collections \
@@ -114,9 +124,9 @@ curl http://localhost:8080/api/buckets/avatars/files/<file_id> -H "$AUTH" -o ava
 
 ## 6. Open the admin dashboard
 
-Browse to <http://localhost:8080/> and sign in with the same email/password.
-The dashboard gives you a UI over collections, records, buckets, webhooks,
-secrets, WebSockets, cache, notifications, logs, and pub/sub.
+Browse to <http://localhost:8080/> and sign in with the same email/password. The
+dashboard gives you a UI over collections, records, buckets, webhooks, secrets,
+WebSockets, cache, notifications, logs, and pub/sub.
 
 ## 7. Try realtime
 
@@ -132,7 +142,9 @@ See [Realtime](../concepts/realtime.md) for WebSockets and pub/sub details.
 
 ## Next steps
 
-- [API conventions](../api-reference/conventions.md) — auth header, errors, pagination
+- [API conventions](../api-reference/conventions.md) — auth header, errors,
+  pagination
 - [Webhooks](../concepts/webhooks.md) — get HTTP callbacks on data changes
 - [MCP server](../guides/mcp-server.md) — let AI agents operate your backend
-- [PocketBase comparison](../../README.md#pocketbase-comparison) — feature matrix
+- [PocketBase comparison](../../README.md#pocketbase-comparison) — feature
+  matrix

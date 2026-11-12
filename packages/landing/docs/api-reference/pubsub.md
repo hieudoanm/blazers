@@ -13,8 +13,8 @@ List topics: `[{id, name, created_at}]`.
 
 ### `POST /api/pubsub/topics`
 
-**Body** `{"name": "orders"}` → `201` with the `PubSubTopic`.
-Fires `pubsub.topic.create`.
+**Body** `{"name": "orders"}` → `201` with the `PubSubTopic`. Fires
+`pubsub.topic.create`.
 
 ### `GET /api/pubsub/topics/{name}`
 
@@ -40,18 +40,18 @@ Publish.
 
 **Body** `{"body": "order #123 shipped"}` — `body` required (`400` if empty).
 
-**Response `201`** — the `PubSubMessage`. Broadcasts to every connected
-SSE client and fires `pubsub.message.create`.
+**Response `201`** — the `PubSubMessage`. Broadcasts to every connected SSE
+client and fires `pubsub.message.create`.
 
 ## `GET /api/pubsub/{name}/stream` — SSE
 
-Unauthenticated server-sent stream. Every published message (any topic)
-arrives as:
+Unauthenticated server-sent stream. Every published message (any topic) arrives
+as:
 
 ```text
 data: {"id":"...","topic_id":"...","body":"...","created_at":"..."}
 ```
 
-> The `{name}` path segment is accepted but **not** used for filtering —
-> all pub/sub messages fan out to all connected clients. Filter by
-> `topic_id` client-side.
+> The `{name}` path segment is accepted but **not** used for filtering — all
+> pub/sub messages fan out to all connected clients. Filter by `topic_id`
+> client-side.

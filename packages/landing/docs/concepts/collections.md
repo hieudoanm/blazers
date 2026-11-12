@@ -1,7 +1,7 @@
 # Collections & records
 
-Collections are the heart of Blazers — the equivalent of PocketBase
-collections and Supabase tables, but with a deliberately small surface.
+Collections are the heart of Blazers — the equivalent of PocketBase collections
+and Supabase tables, but with a deliberately small surface.
 
 ## Collections
 
@@ -43,16 +43,16 @@ Append `?` to the field name to make it optional:
 { "slug?": "string", "tags?": "array" }
 ```
 
-Fields **not** in the schema are still stored inside the record's `data`
-JSON blob — the schema governs typed columns and required-field validation,
-not a hard column allowlist. `{}` (or omitting `schema`) means schemaless.
+Fields **not** in the schema are still stored inside the record's `data` JSON
+blob — the schema governs typed columns and required-field validation, not a
+hard column allowlist. `{}` (or omitting `schema`) means schemaless.
 
 ### Updating a schema
 
 `PATCH /api/collections/{name}` with `{"schema": "..."}` runs
-`migrate_collection_schema`, which adds new columns and relaxes types.
-Changing a field's type on existing data is not a migration tool — treat
-schema edits as additive.
+`migrate_collection_schema`, which adds new columns and relaxes types. Changing
+a field's type on existing data is not a migration tool — treat schema edits as
+additive.
 
 ## Records
 
@@ -68,8 +68,8 @@ typed schema fields are validated on create/update (`validate_data`).
 }
 ```
 
-You may supply your own `id` on create (`CreateRecordRequest.id`) — useful
-for imports and idempotent seeds.
+You may supply your own `id` on create (`CreateRecordRequest.id`) — useful for
+imports and idempotent seeds.
 
 ## Listing & search
 
@@ -95,7 +95,7 @@ Response:
 
 ## Permissions
 
-Collection access is governed by [RBAC permissions](permissions.md): each
-user has a role (`viewer`, `editor`, `admin`) per collection name, or `*`
-for global admin. Handlers call `rbac::require_role(conn, user_id, name,
-"viewer")` before touching records.
+Collection access is governed by [RBAC permissions](permissions.md): each user
+has a role (`viewer`, `editor`, `admin`) per collection name, or `*` for global
+admin. Handlers call `rbac::require_role(conn, user_id, name, "viewer")` before
+touching records.

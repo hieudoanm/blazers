@@ -64,7 +64,9 @@ const resolveHref = (href: string, fromSlug: string): string => {
     return `${REPO_BLOB}/${repoPath}${suffix}`;
   }
   const resolved = stack.join('/').replace(/\.md$/, '');
-  const prefix = resolved ? `${BASE_PATH}/docs/${resolved}/` : `${BASE_PATH}/docs/`;
+  const prefix = resolved
+    ? `${BASE_PATH}/docs/${resolved}/`
+    : `${BASE_PATH}/docs/`;
   return `${prefix}${suffix}`;
 };
 
@@ -87,13 +89,16 @@ const slugify = (text: string): string => {
 /** Add id attributes to h1–h6 so `#anchor` links resolve. */
 const addHeadingIds = (html: string): string => {
   const used = new Map<string, number>();
-  return html.replace(/<h([1-6])>([\s\S]*?)<\/h\1>/g, (match, level: string, inner: string) => {
-    let id = slugify(inner);
-    const n = used.get(id) ?? 0;
-    used.set(id, n + 1);
-    if (n > 0) id = `${id}-${n}`;
-    return `<h${level} id="${id}">${inner}</h${level}>`;
-  });
+  return html.replace(
+    /<h([1-6])>([\s\S]*?)<\/h\1>/g,
+    (match, level: string, inner: string) => {
+      let id = slugify(inner);
+      const n = used.get(id) ?? 0;
+      used.set(id, n + 1);
+      if (n > 0) id = `${id}-${n}`;
+      return `<h${level} id="${id}">${inner}</h${level}>`;
+    }
+  );
 };
 
 /** Generated SVG diagrams can't take utilities — frame them via class injection. */
@@ -104,7 +109,10 @@ const frameSvgs = (html: string): string => {
   return html.replace(/<svg\b([^>]*)>/g, (match, attrs: string) => {
     const cls = attrs.match(/class="([^"]*)"/);
     if (cls) {
-      return match.replace(`class="${cls[1]}"`, `class="${SVG_CLASS} ${cls[1]}"`);
+      return match.replace(
+        `class="${cls[1]}"`,
+        `class="${SVG_CLASS} ${cls[1]}"`
+      );
     }
     return `<svg class="${SVG_CLASS}"${attrs}>`;
   });

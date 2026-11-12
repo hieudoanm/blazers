@@ -11,8 +11,8 @@ static-export site with Tailwind CSS v4, deployed to GitHub Pages at
 - `src/app/globals.css` — Tailwind v4 `@theme` tokens (flame-orange accent,
   light theme, dark terminal blocks) + docs markdown styles
 - `docs/` — the documentation source (Markdown), rendered at build time to
-  `/docs/*` routes; `lib/docs.ts` handles loading, link rewriting and
-  heading anchors
+  `/docs/*` routes; `lib/docs.ts` handles loading, link rewriting and heading
+  anchors
 - `public/` — `logo.svg`, `favicon.svg`, `favicon.ico`, `robots.txt`,
   `sitemap.xml`, `humans.txt`
 
@@ -30,5 +30,6 @@ project site). `lib/docs.ts` `BASE_PATH` must match.
 
 ## Deploy
 
-CI runs `pnpm install --frozen-lockfile && pnpm run build` and uploads `packages/landing/out` to
-GitHub Pages (see `.github/workflows/ci.yaml`, `pages` job).
+CI runs `pnpm install --frozen-lockfile && pnpm run build` and uploads
+`packages/landing/out` to GitHub Pages (see `.github/workflows/ci.yaml`, `pages`
+job).

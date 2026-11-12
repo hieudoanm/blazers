@@ -7,8 +7,8 @@ upload/delete. All requests need a JWT.
 
 ## `POST /api/buckets/{name}/files` — upload
 
-`multipart/form-data` with a single file field (field name is ignored —
-the first field wins):
+`multipart/form-data` with a single file field (field name is ignored — the
+first field wins):
 
 ```sh
 curl -X POST http://localhost:8080/api/buckets/avatars/files \

@@ -17,8 +17,8 @@ That's it. The server:
 
 - creates `BLAZERS_DATA` and `data.db` on first run (migrations automatic)
 - generates the secrets-vault key inside `BLAZERS_DATA`
-- serves the API, admin dashboard (`/`), OpenAPI (`/api/docs`), and all
-  realtime streams on `PORT`
+- serves the API, admin dashboard (`/`), OpenAPI (`/api/docs`), and all realtime
+  streams on `PORT`
 
 ## Docker
 
@@ -61,9 +61,9 @@ api.example.com {
 }
 ```
 
-WebSocket (`/ws`) and SSE (`/api/*/stream`) both work through standard
-reverse proxies — SSE needs no special config beyond disabling response
-buffering if your proxy buffers by default.
+WebSocket (`/ws`) and SSE (`/api/*/stream`) both work through standard reverse
+proxies — SSE needs no special config beyond disabling response buffering if
+your proxy buffers by default.
 
 ## Data backup
 
@@ -73,8 +73,8 @@ Three options, simplest first:
    secrets key). To back up live, use option 2.
 2. **`GET /api/backup`** — admin-only SQLite snapshot download; restore by
    placing the file as `data.db`.
-3. **`GET /api/export`** — portable JSON (collections, records, buckets,
-   file metadata); pair with a copy of `BLAZERS_DATA/files/` for bytes.
+3. **`GET /api/export`** — portable JSON (collections, records, buckets, file
+   metadata); pair with a copy of `BLAZERS_DATA/files/` for bytes.
 
 ## Security checklist
 
@@ -82,17 +82,17 @@ Three options, simplest first:
 - [ ] `BLAZERS_DATA` on encrypted storage; secrets key backed up separately
 - [ ] Rate limiting is per-IP — front with a proxy if you need global limits
 - [ ] SSE streams (`/api/logs/stream`, `/api/pubsub/*/stream`,
-      `/api/notifications/stream`) are **unauthenticated** — restrict them
-      at the proxy if the data is sensitive
-- [ ] `/api/backup`, `/api/import`, `/api/export` need an `admin` token —
-      keep admin credentials out of client-side code
+      `/api/notifications/stream`) are **unauthenticated** — restrict them at
+      the proxy if the data is sensitive
+- [ ] `/api/backup`, `/api/import`, `/api/export` need an `admin` token — keep
+      admin credentials out of client-side code
 - [ ] CORS is permissive — add origin restrictions at the proxy for
       browser-facing deployments
 
 ## Scaling notes
 
-Blazers is single-node by design: one process, one SQLite file, in-memory
-cache and realtime hubs. It comfortably handles thousands of concurrent
-SSE/WS connections and moderate write throughput. For multi-node you would
-need external Postgres/Redis — at that point you're past the "one binary"
-value proposition; run one instance per tenant instead.
+Blazers is single-node by design: one process, one SQLite file, in-memory cache
+and realtime hubs. It comfortably handles thousands of concurrent SSE/WS
+connections and moderate write throughput. For multi-node you would need
+external Postgres/Redis — at that point you're past the "one binary" value
+proposition; run one instance per tenant instead.

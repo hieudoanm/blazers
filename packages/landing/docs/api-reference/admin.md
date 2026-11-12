@@ -15,9 +15,9 @@ Liveness probe. **No auth.**
 Download a consistent copy of the SQLite database.
 
 - Requires `admin` role on `*` (global admin).
-- Response: `application/octet-stream` SQLite file
-  (`blazers-backup-<uuid>.db`), suitable for `sqlite3` inspection or
-  restoring into `BLAZERS_DATA/data.db` while the server is stopped.
+- Response: `application/octet-stream` SQLite file (`blazers-backup-<uuid>.db`),
+  suitable for `sqlite3` inspection or restoring into `BLAZERS_DATA/data.db`
+  while the server is stopped.
 
 ```sh
 curl http://localhost:8080/api/backup -H "$AUTH" -o backup.db
@@ -25,8 +25,7 @@ curl http://localhost:8080/api/backup -H "$AUTH" -o backup.db
 
 ## `GET /api/export` — portability export
 
-JSON document with **all** collections, records, buckets, and file
-metadata:
+JSON document with **all** collections, records, buckets, and file metadata:
 
 ```json
 {
@@ -37,13 +36,13 @@ metadata:
 }
 ```
 
-Requires auth. Does **not** include file bytes — pair with a filesystem
-backup of `BLAZERS_DATA/files/` for a full export.
+Requires auth. Does **not** include file bytes — pair with a filesystem backup
+of `BLAZERS_DATA/files/` for a full export.
 
 ## `POST /api/import` — portability import
 
-Accepts the same `ExportData` shape (every field optional — partial
-payloads are fine). Query param `?skip_existing=true|false`:
+Accepts the same `ExportData` shape (every field optional — partial payloads are
+fine). Query param `?skip_existing=true|false`:
 
 - `skip_existing=true` — conflicting ids are skipped, import continues.
 - `skip_existing=false` (**default**) — first conflict aborts with `409`.

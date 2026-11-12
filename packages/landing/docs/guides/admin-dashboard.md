@@ -37,20 +37,19 @@ The dashboard holds three SSE connections:
 
 ## Template rules
 
-Templates are Mustache, rendered by htmx's client-side-templates
-extension. Two pitfalls we've hit:
+Templates are Mustache, rendered by htmx's client-side-templates extension. Two
+pitfalls we've hit:
 
-1. **Never nest `<script>` inside `<script type="x-tmpl-mustache">`** —
-   the HTML parser truncates the outer script at the first inner
-   `</script>` and the rest of the template leaks as literal `{{...}}`
-   text. Post-process rendered DOM in `htmx:afterSwap` instead.
-2. Sections like `{{#files}}...{{/files}}` iterate arrays; `{{^files}}`
-   renders the empty state. Context must match the API response shape
-   (`FilesPage` → `{files: [...]}`, `WebhookLog[]` → `{{#.}}`).
+1. **Never nest `<script>` inside `<script type="x-tmpl-mustache">`** — the HTML
+   parser truncates the outer script at the first inner `</script>` and the rest
+   of the template leaks as literal `{{...}}` text. Post-process rendered DOM in
+   `htmx:afterSwap` instead.
+2. Sections like `{{#files}}...{{/files}}` iterate arrays; `{{^files}}` renders
+   the empty state. Context must match the API response shape (`FilesPage` →
+   `{files: [...]}`, `WebhookLog[]` → `{{#.}}`).
 
 ## Customizing
 
-Edit `crates/blazers-server/public/index.html` and `styles.css`, then
-rebuild — `rust-embed` bakes the assets into the binary at compile time.
-Touch a `.rs` file (or `cargo clean -p blazers-server`) to force the
-re-embed.
+Edit `crates/blazers-server/public/index.html` and `styles.css`, then rebuild —
+`rust-embed` bakes the assets into the binary at compile time. Touch a `.rs`
+file (or `cargo clean -p blazers-server`) to force the re-embed.

@@ -1,8 +1,8 @@
 # Logs
 
-The log store is a structured, queryable event log — think PocketBase's
-`_logs` table plus aRealtime tail, minus the request-log noise (HTTP access
-logs go to stdout, not this table).
+The log store is a structured, queryable event log — think PocketBase's `_logs`
+table plus aRealtime tail, minus the request-log noise (HTTP access logs go to
+stdout, not this table).
 
 ## Model
 
@@ -39,5 +39,5 @@ webhooks — so external systems can tail your app's log stream.
 ## What writes here
 
 Anything that calls the API — your app, cron jobs reporting results, or the
-admin dashboard's "Add log" action. Blazers itself writes HTTP access logs
-to stdout only; it does **not** mirror them into this table.
+admin dashboard's "Add log" action. Blazers itself writes HTTP access logs to
+stdout only; it does **not** mirror them into this table.

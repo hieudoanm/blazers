@@ -1,9 +1,21 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import type { FC, ReactNode } from 'react';
+import Footer from '@/components/molecules/Footer';
+import Navbar from '@/components/molecules/Navbar';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
+
+const GITHUB = 'https://github.com/hieudoanm/blazers';
+const LOGO =
+  process.env.NODE_ENV === 'production' ? '/blazers/logo.svg' : '/logo.svg';
+const NAV_LINKS = [
+  { label: 'Features', href: '#features' },
+  { label: 'vs PocketBase', href: '#compare' },
+  { label: 'Quickstart', href: '#quickstart' },
+  { label: 'Docs', href: '/docs/' },
+];
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://hieudoanm.github.io/blazers/'),
@@ -31,10 +43,24 @@ interface RootLayoutProps {
 
 const RootLayout: FC<RootLayoutProps> = ({ children }) => (
   <html
-    lang='en'
-    data-theme='blazers'
+    lang="en"
+    data-theme="blazers"
     className={`scroll-smooth antialiased motion-reduce:scroll-auto ${inter.className}`}>
-    <body className='m-0 bg-base-100 text-base-content leading-relaxed'>{children}</body>
+    <body className="bg-base-100 text-base-content m-0 leading-relaxed">
+      <Navbar
+        name="blazers"
+        logoSrc={LOGO}
+        links={NAV_LINKS}
+        githubUrl={GITHUB}
+      />
+      {children}
+      <Footer
+        name="blazers"
+        tagline="Blazing fast Back-end as a Service · Rust · SQLite · MIT"
+        githubUrl={GITHUB}
+      />
+      
+    </body>
   </html>
 );
 

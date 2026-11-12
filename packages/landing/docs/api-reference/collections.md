@@ -2,8 +2,8 @@
 
 Concepts: [Collections & records](../concepts/collections.md)
 
-All endpoints require `Authorization: Bearer <token>` and RBAC `viewer`
-(or higher) on the collection.
+All endpoints require `Authorization: Bearer <token>` and RBAC `viewer` (or
+higher) on the collection.
 
 ## `GET /api/collections`
 

@@ -55,8 +55,8 @@ default, so `blazers serve` is enough to get started.
 | `JWT_SECRET`   | `dev-secret-change-in-production` | JWT signing secret — **set in production** |
 
 The secrets-vault encryption key (AES-256-GCM) is generated automatically on
-first run and stored inside `BLAZERS_DATA`. Back up that directory to keep
-your secrets decryptable.
+first run and stored inside `BLAZERS_DATA`. Back up that directory to keep your
+secrets decryptable.
 
 ## Verify the install
 

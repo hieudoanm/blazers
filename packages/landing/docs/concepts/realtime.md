@@ -1,13 +1,13 @@
 # Realtime
 
-Blazers has three realtime channels, all in-process and all optional — pick
-per use case.
+Blazers has three realtime channels, all in-process and all optional — pick per
+use case.
 
 ## WebSocket — `/ws`
 
 A persistent bidirectional socket. The server tracks every connection in the
-`ws_connections` table and every frame in `ws_messages`, so you can audit
-who was connected and what was said.
+`ws_connections` table and every frame in `ws_messages`, so you can audit who
+was connected and what was said.
 
 ```js
 const ws = new WebSocket('ws://localhost:8080/ws');
@@ -21,13 +21,12 @@ Server-side you can:
 - broadcast to all — `POST /api/websockets/broadcast`
 - list/audit connections and messages via the REST endpoints
 
-Useful for chat, live cursors, game state — anything needing client→server
-push.
+Useful for chat, live cursors, game state — anything needing client→server push.
 
 ## Server-Sent Events — three streams
 
-SSE is one-way (server→client) but works over plain HTTP/1.1 and through
-most proxies. Blazers exposes:
+SSE is one-way (server→client) but works over plain HTTP/1.1 and through most
+proxies. Blazers exposes:
 
 | Endpoint                    | Stream contents                       |
 | --------------------------- | ------------------------------------- |
@@ -40,8 +39,8 @@ curl -N http://localhost:8080/api/logs/stream
 # data: {"id":"...","level":"info","message":"...","created_at":"..."}
 ```
 
-Each stream keeps the connection alive with SSE `keep-alive` comments and
-holds a 1-hour server-side lease.
+Each stream keeps the connection alive with SSE `keep-alive` comments and holds
+a 1-hour server-side lease.
 
 ## Pub/Sub topics
 
@@ -49,8 +48,8 @@ On top of the message log, pub/sub gives you named channels:
 
 1. `POST /api/pubsub/topics` — create a topic (`{"name": "orders"}`)
 2. `POST /api/pubsub/topics/orders/messages` — publish (`{"body": "..."}`)
-3. Every connected client on `/api/pubsub/*/stream` receives the message
-   as an SSE `data:` event containing the `PubSubMessage` JSON
+3. Every connected client on `/api/pubsub/*/stream` receives the message as an
+   SSE `data:` event containing the `PubSubMessage` JSON
    (`{id, topic_id, body, created_at}`).
 
 Messages are also persisted in `pubsub_messages`, so late joiners can read
@@ -80,9 +79,9 @@ history via `GET /api/pubsub/topics/{name}/messages`.
 </svg>
 
 > The stream endpoint accepts a topic name in the path
-> (`/api/pubsub/{name}/stream`) but currently fans out **all** pub/sub
-> messages to every connected client — filter by `topic_id` client-side
-> until per-topic streams land.
+> (`/api/pubsub/{name}/stream`) but currently fans out **all** pub/sub messages
+> to every connected client — filter by `topic_id` client-side until per-topic
+> streams land.
 
 ## Choosing a channel
 

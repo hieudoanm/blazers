@@ -14,14 +14,14 @@ http://localhost:8080        # default (PORT env var)
 Authorization: Bearer <jwt>
 ```
 
-Get a token from `POST /api/auth/login` or `/api/auth/register`.
-See [Authentication](../concepts/authentication.md).
+Get a token from `POST /api/auth/login` or `/api/auth/register`. See
+[Authentication](../concepts/authentication.md).
 
 ## Content types
 
-- Requests that mutate data must send `Content-Type: application/json`
-  (enforced by middleware) — **except** multipart uploads
-  (`/files` endpoints) and the SSE streams.
+- Requests that mutate data must send `Content-Type: application/json` (enforced
+  by middleware) — **except** multipart uploads (`/files` endpoints) and the SSE
+  streams.
 - Responses are `application/json` except file downloads and `/api/backup`
   (SQLite bytes) and `/api/docs` (HTML).
 
@@ -46,27 +46,27 @@ Errors share one shape via `AppError`:
 
 ## Pagination
 
-List endpoints that page accept `?page=` (1-based) and `?per_page=`
-(clamped `1..=100`, default `20`) and return:
+List endpoints that page accept `?page=` (1-based) and `?per_page=` (clamped
+`1..=100`, default `20`) and return:
 
 ```json
 { "items": [...], "total": N, "page": 1, "per_page": 20, "total_pages": M }
 ```
 
-The key holding the items varies (`records`, `files`, …) — see each
-endpoint's page.
+The key holding the items varies (`records`, `files`, …) — see each endpoint's
+page.
 
 ## Rate limiting
 
-A per-IP token bucket runs on the whole `/api` router before handlers.
-Burst allowance is modest; SSE streams and the admin dashboard's polling
-are designed to stay well under it.
+A per-IP token bucket runs on the whole `/api` router before handlers. Burst
+allowance is modest; SSE streams and the admin dashboard's polling are designed
+to stay well under it.
 
 ## CORS
 
-`CorsLayer::permissive()` — any origin may call the API from a browser.
-Do not expose a Blazers instance holding sensitive data to untrusted
-origins without a reverse-proxy layer in front.
+`CorsLayer::permissive()` — any origin may call the API from a browser. Do not
+expose a Blazers instance holding sensitive data to untrusted origins without a
+reverse-proxy layer in front.
 
 ## OpenAPI & docs
 

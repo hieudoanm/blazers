@@ -1,8 +1,8 @@
 # Webhooks
 
 Webhooks deliver HTTP callbacks to your own endpoints whenever Blazers data
-changes — the same idea as PocketBase hooks, but outbound-only and
-configurable per event.
+changes — the same idea as PocketBase hooks, but outbound-only and configurable
+per event.
 
 ## Events
 
@@ -24,8 +24,8 @@ cronjob.create    cronjob.update    cronjob.delete
 
 ## Delivery
 
-When an event fires, Blazers POSTs a JSON payload to each active webhook
-whose `events` list matches:
+When an event fires, Blazers POSTs a JSON payload to each active webhook whose
+`events` list matches:
 
 ```http
 POST https://your.app/hook
@@ -35,8 +35,8 @@ X-Webhook-Event: record.create
 X-Webhook-Signature-256: <hex hmac-sha256>   # only if webhook.secret set
 ```
 
-The signature is `HMAC-SHA256(secret, body)` hex-encoded — verify it to
-prove the request came from Blazers.
+The signature is `HMAC-SHA256(secret, body)` hex-encoded — verify it to prove
+the request came from Blazers.
 
 Payload keys vary by event:
 
@@ -52,8 +52,8 @@ Payload keys vary by event:
 | `notification.*`   | the notification object itself              |
 | `log.*`            | the log entry object itself                 |
 
-> `secret.*` payloads contain the **stored (encrypted)** value, not
-> plaintext — secrets are never decrypted for webhook delivery.
+> `secret.*` payloads contain the **stored (encrypted)** value, not plaintext —
+> secrets are never decrypted for webhook delivery.
 
 ## Delivery logs
 
@@ -74,9 +74,9 @@ Every attempt is recorded in `webhook_logs`:
 }
 ```
 
-`status` is `success` or `failure`; `error` holds the transport error when
-the request never completed. Inspect deliveries with
-`GET /api/webhooks/{id}/logs` or the admin dashboard.
+`status` is `success` or `failure`; `error` holds the transport error when the
+request never completed. Inspect deliveries with `GET /api/webhooks/{id}/logs`
+or the admin dashboard.
 
 ## Managing webhooks
 

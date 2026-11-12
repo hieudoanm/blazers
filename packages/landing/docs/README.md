@@ -4,7 +4,8 @@ Blazers is a single-binary Backend-as-a-Service: SQLite database, auth, file
 storage, realtime, webhooks, cache, notifications, logs, cron, a secrets vault,
 an admin dashboard, and an MCP server — all in one Rust executable.
 
-This documentation is organized like the [PocketBase docs](https://pocketbase.io/docs/):
+This documentation is organized like the
+[PocketBase docs](https://pocketbase.io/docs/):
 
 - **Getting started** — install, configure, and make your first API call.
 - **Concepts** — how each subsystem works and when to use it.

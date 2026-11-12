@@ -61,10 +61,10 @@ crates/
   blazers/         # thin binary: `blazers serve` / `blazers kv` / `blazers mcp serve`
 ```
 
-`blazers-core` owns persistence and knows nothing about HTTP.
-`blazers-server` owns every feature and embeds the dashboard assets
-(`public/`) into the binary via `rust-embed`. `blazers-mcp` talks to the
-same SQLite database directly, so MCP tools and the HTTP API always agree.
+`blazers-core` owns persistence and knows nothing about HTTP. `blazers-server`
+owns every feature and embeds the dashboard assets (`public/`) into the binary
+via `rust-embed`. `blazers-mcp` talks to the same SQLite database directly, so
+MCP tools and the HTTP API always agree.
 
 ## Request lifecycle
 
@@ -76,21 +76,21 @@ Every `/api/*` request passes through the same middleware stack:
 4. **Content-Type check** — mutating requests must send `application/json`
    (multipart uploads are exempt).
 5. **Body limit** — 10 MiB maximum request body.
-6. **Handler** — JWT auth (`Authorization: Bearer <token>`), then RBAC
-   role checks against the target collection/bucket.
+6. **Handler** — JWT auth (`Authorization: Bearer <token>`), then RBAC role
+   checks against the target collection/bucket.
 
 ## Persistence model
 
 Everything lives in one SQLite file inside `BLAZERS_DATA`:
 
-- `collections` + dynamically-created record tables — schemaless-ish
-  records validated against the collection's JSON schema.
+- `collections` + dynamically-created record tables — schemaless-ish records
+  validated against the collection's JSON schema.
 - `buckets` + `files` — metadata in SQLite, bytes on the filesystem under
   `BLAZERS_DATA/files/`.
 - `users`, `permissions` — auth and RBAC.
-- `webhooks`, `webhook_logs`, `secrets`, `cache`, `notifications`,
-  `logs`, `cron_jobs`, `cron_job_logs`, `ws_connections`,
-  `ws_messages`, `pubsub_topics`, `pubsub_messages`.
+- `webhooks`, `webhook_logs`, `secrets`, `cache`, `notifications`, `logs`,
+  `cron_jobs`, `cron_job_logs`, `ws_connections`, `ws_messages`,
+  `pubsub_topics`, `pubsub_messages`.
 
 Because it is one file, [backup](api-reference/admin.md) is a file copy and
 [export/import](api-reference/admin.md) is a JSON document.
@@ -99,11 +99,11 @@ Because it is one file, [backup](api-reference/admin.md) is a file copy and
 
 Three independent channels share the same in-process hub pattern:
 
-- **WebSocket** (`/ws`) — persistent bidirectional connections; the server
-  can push to one client or broadcast to all.
+- **WebSocket** (`/ws`) — persistent bidirectional connections; the server can
+  push to one client or broadcast to all.
 - **SSE** (`/api/notifications/stream`, `/api/logs/stream`,
-  `/api/pubsub/{name}/stream`) — one-way server→client streams over plain
-  HTTP, ideal for dashboards and browsers that cannot hold WebSockets.
+  `/api/pubsub/{name}/stream`) — one-way server→client streams over plain HTTP,
+  ideal for dashboards and browsers that cannot hold WebSockets.
 
 ## MCP mode
 

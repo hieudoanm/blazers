@@ -81,34 +81,34 @@ Using a typed op on a key of the wrong type returns `400 WRONGTYPE`.
 
 ### Counters & strings
 
-| Endpoint | Body | Response |
-|---|---|---|
-| `POST /api/cache/{key}/incr` | `{ "by": 1 }` (`by` optional, default 1) | `{ "key", "value" }` — new integer value |
-| `POST /api/cache/{key}/append` | `{ "value": "..." }` | `{ "key", "value" }` — full string after append |
-| `POST /api/cache/{key}/expire` | `{ "ttl": 3600 }` (`0` clears expiry) | `{ "key", "ttl" }`; `404` if missing |
-| `GET /api/cache/{key}/ttl` | — | `{ "key", "ttl" }` — seconds left, `-1` = no expiry; `404` if missing |
+| Endpoint                       | Body                                     | Response                                                              |
+| ------------------------------ | ---------------------------------------- | --------------------------------------------------------------------- |
+| `POST /api/cache/{key}/incr`   | `{ "by": 1 }` (`by` optional, default 1) | `{ "key", "value" }` — new integer value                              |
+| `POST /api/cache/{key}/append` | `{ "value": "..." }`                     | `{ "key", "value" }` — full string after append                       |
+| `POST /api/cache/{key}/expire` | `{ "ttl": 3600 }` (`0` clears expiry)    | `{ "key", "ttl" }`; `404` if missing                                  |
+| `GET /api/cache/{key}/ttl`     | —                                        | `{ "key", "ttl" }` — seconds left, `-1` = no expiry; `404` if missing |
 
-`INCR` on a missing key starts at 0; on a non-integer string it errors.
-All mutations are atomic.
+`INCR` on a missing key starts at 0; on a non-integer string it errors. All
+mutations are atomic.
 
 ### Lists
 
-| Endpoint | Body / query | Response |
-|---|---|---|
-| `POST /api/cache/{key}/list` | `{ "values": [...], "left": false }` | `{ "key", "length" }` — push right (RPUSH) or left (LPUSH) |
-| `POST /api/cache/{key}/list/pop` | `{ "left": false, "count": 1 }` | `{ "key", "value" }` — single item, or array when `count > 1`; `null` when empty |
-| `GET /api/cache/{key}/list?start=0&stop=-1` | Redis-style inclusive range, negatives from end | `{ "key", "items": [...] }` |
+| Endpoint                                    | Body / query                                    | Response                                                                         |
+| ------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------- |
+| `POST /api/cache/{key}/list`                | `{ "values": [...], "left": false }`            | `{ "key", "length" }` — push right (RPUSH) or left (LPUSH)                       |
+| `POST /api/cache/{key}/list/pop`            | `{ "left": false, "count": 1 }`                 | `{ "key", "value" }` — single item, or array when `count > 1`; `null` when empty |
+| `GET /api/cache/{key}/list?start=0&stop=-1` | Redis-style inclusive range, negatives from end | `{ "key", "items": [...] }`                                                      |
 
 An emptied list key is deleted, like Redis.
 
 ### Hashes
 
-| Endpoint | Body | Response |
-|---|---|---|
-| `POST /api/cache/{key}/hash` | `{ "field": "f", "value": v }` or `{ "fields": {"f": v, ...} }` | `{ "key", "fields_set" }` |
-| `GET /api/cache/{key}/hash` | — | `{ "key", "fields": {...} }` |
-| `GET /api/cache/{key}/hash/{field}` | — | `{ "key", "field", "value" }` (`value: null` if absent) |
-| `DELETE /api/cache/{key}/hash/{field}` | comma-separated fields allowed | `{ "key", "removed" }` |
+| Endpoint                               | Body                                                            | Response                                                |
+| -------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------- |
+| `POST /api/cache/{key}/hash`           | `{ "field": "f", "value": v }` or `{ "fields": {"f": v, ...} }` | `{ "key", "fields_set" }`                               |
+| `GET /api/cache/{key}/hash`            | —                                                               | `{ "key", "fields": {...} }`                            |
+| `GET /api/cache/{key}/hash/{field}`    | —                                                               | `{ "key", "field", "value" }` (`value: null` if absent) |
+| `DELETE /api/cache/{key}/hash/{field}` | comma-separated fields allowed                                  | `{ "key", "removed" }`                                  |
 
 An emptied hash key is deleted. Hash field values are arbitrary JSON.
 
@@ -136,28 +136,28 @@ v
 29
 ```
 
-| Command | Reply |
-|---|---|
-| `PING` | `PONG` |
-| `SET key value [EX seconds]` | `OK` / `ERR invalid expire time` |
-| `GET key` | value, `(nil)`, or the typed JSON envelope |
-| `DEL key [key ...]` | count removed |
-| `EXISTS key` | `1` / `0` |
-| `KEYS [pattern]` | sorted keys; `*` and `?` glob |
-| `TYPE key` | `string` / `list` / `hash` / `none` |
-| `LEN` | unexpired key count |
-| `FLUSHALL` / `FLUSHDB` | `OK` |
-| `EXPIRE key seconds` | `1` / `0` |
-| `TTL key` | seconds left, `-1` no expiry, `-2` missing |
-| `INCR key` / `DECR key` / `INCRBY key n` | new integer |
-| `APPEND key value` | new string length |
-| `LPUSH`/`RPUSH key v [v ...]` | new list length |
-| `LPOP`/`RPOP key [count]` | item(s) or `(nil)` |
-| `LRANGE key start stop` | space-separated slice |
-| `HSET key f v [f v ...]` | fields written |
-| `HGET key f` / `HGETALL key` / `HDEL key f ...` / `HLEN key` | field ops |
+| Command                                                      | Reply                                      |
+| ------------------------------------------------------------ | ------------------------------------------ |
+| `PING`                                                       | `PONG`                                     |
+| `SET key value [EX seconds]`                                 | `OK` / `ERR invalid expire time`           |
+| `GET key`                                                    | value, `(nil)`, or the typed JSON envelope |
+| `DEL key [key ...]`                                          | count removed                              |
+| `EXISTS key`                                                 | `1` / `0`                                  |
+| `KEYS [pattern]`                                             | sorted keys; `*` and `?` glob              |
+| `TYPE key`                                                   | `string` / `list` / `hash` / `none`        |
+| `LEN`                                                        | unexpired key count                        |
+| `FLUSHALL` / `FLUSHDB`                                       | `OK`                                       |
+| `EXPIRE key seconds`                                         | `1` / `0`                                  |
+| `TTL key`                                                    | seconds left, `-1` no expiry, `-2` missing |
+| `INCR key` / `DECR key` / `INCRBY key n`                     | new integer                                |
+| `APPEND key value`                                           | new string length                          |
+| `LPUSH`/`RPUSH key v [v ...]`                                | new list length                            |
+| `LPOP`/`RPOP key [count]`                                    | item(s) or `(nil)`                         |
+| `LRANGE key start stop`                                      | space-separated slice                      |
+| `HSET key f v [f v ...]`                                     | fields written                             |
+| `HGET key f` / `HGETALL key` / `HDEL key f ...` / `HLEN key` | field ops                                  |
 
 Errors are `ERR …` lines; type mismatches are `ERR WRONGTYPE …`.
 
-Set `BLAZERS_KV_PASSWORD` to require `AUTH password` before any other
-command (`NOAUTH` until authenticated, `WRONGPASS` on a bad password).
+Set `BLAZERS_KV_PASSWORD` to require `AUTH password` before any other command
+(`NOAUTH` until authenticated, `WRONGPASS` on a bad password).

@@ -45,6 +45,6 @@ Server-sent events; each new notification arrives as:
 data: {"id":"...","title":"...","type":"success","is_read":false,"created_at":"..."}
 ```
 
-Keep-alive comments are sent periodically. **No authentication** — the
-stream routes live outside the authenticated `/api` middleware stack; put a
-reverse proxy in front if the stream must be private.
+Keep-alive comments are sent periodically. **No authentication** — the stream
+routes live outside the authenticated `/api` middleware stack; put a reverse
+proxy in front if the stream must be private.

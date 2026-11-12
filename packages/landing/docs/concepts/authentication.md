@@ -1,8 +1,8 @@
 # Authentication
 
 Blazers uses email + password auth with JWT bearer tokens. There are no OAuth
-providers or MFA — the model is deliberately minimal, like PocketBase's
-`users` auth collection.
+providers or MFA — the model is deliberately minimal, like PocketBase's `users`
+auth collection.
 
 ## Users
 
@@ -28,8 +28,8 @@ Content-Type: application/json
 {"email": "admin@example.com", "password": "s3cret"}
 ```
 
-Returns `200` with the `UserResponse` — registration does **not** issue a
-token; call `/api/auth/login` next.
+Returns `200` with the `UserResponse` — registration does **not** issue a token;
+call `/api/auth/login` next.
 
 ## Login
 
@@ -40,8 +40,8 @@ Content-Type: application/json
 {"email": "admin@example.com", "password": "s3cret"}
 ```
 
-Returns `{ "user": {...}, "token": "eyJ..." }` — the only endpoint that
-issues tokens.
+Returns `{ "user": {...}, "token": "eyJ..." }` — the only endpoint that issues
+tokens.
 
 ## Using the token
 
@@ -67,9 +67,9 @@ shape (`sub` = user id).
 
 ## Sessions
 
-There is no session table and no refresh-token rotation: a token is valid
-until it expires or `JWT_SECRET` changes. For long-lived services, store the
-token and re-login on `401`.
+There is no session table and no refresh-token rotation: a token is valid until
+it expires or `JWT_SECRET` changes. For long-lived services, store the token and
+re-login on `401`.
 
 ## Password reset / email verification
 

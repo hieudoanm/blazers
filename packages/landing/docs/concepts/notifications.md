@@ -17,8 +17,8 @@ channels or PocketBase's optional notification hooks.
 }
 ```
 
-`type` is a free-form string; the admin dashboard color-codes
-`info` / `success` / `warning` / `error`.
+`type` is a free-form string; the admin dashboard color-codes `info` / `success`
+/ `warning` / `error`.
 
 ## REST
 
@@ -40,7 +40,8 @@ curl -N http://localhost:8080/api/notifications/stream
 
 Every `POST /api/notifications` also:
 
-1. broadcasts the entry on the SSE stream (`notification::broadcast_notification`), and
+1. broadcasts the entry on the SSE stream
+   (`notification::broadcast_notification`), and
 2. fires `notification.create` webhooks.
 
 The admin dashboard uses this stream to bump the sidebar badge live.

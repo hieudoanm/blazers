@@ -2,8 +2,8 @@
 
 Concepts: [Collections & records](../concepts/collections.md)
 
-Base: `/api/collections/{name}/records` — RBAC `viewer` to read, `editor`
-to write (`admin` satisfies both via the role rules).
+Base: `/api/collections/{name}/records` — RBAC `viewer` to read, `editor` to
+write (`admin` satisfies both via the role rules).
 
 ## `GET /api/collections/{name}/records`
 
@@ -37,8 +37,8 @@ Create a record.
 { "id": "optional-custom-id", "data": { "title": "Hello", "views": 0 } }
 ```
 
-`data` is validated against the collection schema (required fields,
-types). `id` may be omitted (UUID generated).
+`data` is validated against the collection schema (required fields, types). `id`
+may be omitted (UUID generated).
 
 **Response `201`** — the created `Record`.
 
@@ -50,8 +50,8 @@ Fetch one record. `404` if missing.
 
 ## `PATCH /api/collections/{name}/records/{id}`
 
-**Replaces** the record's `data` object wholesale (not a merge) and
-re-validates against the full schema — send the complete object.
+**Replaces** the record's `data` object wholesale (not a merge) and re-validates
+against the full schema — send the complete object.
 
 **Body**
 

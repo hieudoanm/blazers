@@ -44,8 +44,8 @@ Update any field (including `is_active` to pause/resume). Fires
 
 ## `POST /api/cronjobs/{id}/run` — trigger now
 
-Executes the job immediately (same path as the scheduler). Returns `200`
-after kicking off execution.
+Executes the job immediately (same path as the scheduler). Returns `200` after
+kicking off execution.
 
 ## `GET /api/cronjobs/{id}/logs`
 

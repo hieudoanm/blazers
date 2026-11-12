@@ -11,7 +11,12 @@ List all buckets.
 **Response `200`** — array of `Bucket` objects:
 
 ```json
-{ "name": "avatars", "is_public": true, "created_at": "...", "updated_at": "..." }
+{
+  "name": "avatars",
+  "is_public": true,
+  "created_at": "...",
+  "updated_at": "..."
+}
 ```
 
 ## `POST /api/buckets`

@@ -15,10 +15,10 @@ Supabase Storage buckets.
 ```
 
 - `is_public` is stored on the bucket and surfaced in the API. Note that
-  `download_file` currently requires a valid JWT for **all** buckets —
-  treat `is_public` as metadata until public-download enforcement is added.
-- Deleting a bucket deletes its file metadata (verify filesystem cleanup in
-  your deployment if you rely on it).
+  `download_file` currently requires a valid JWT for **all** buckets — treat
+  `is_public` as metadata until public-download enforcement is added.
+- Deleting a bucket deletes its file metadata (verify filesystem cleanup in your
+  deployment if you rely on it).
 
 ## Uploading
 
@@ -73,6 +73,6 @@ For image files, a JPEG thumbnail can be generated on demand:
 GET /api/buckets/{name}/files/{id}/thumb
 ```
 
-`image::generate_thumbnail` decodes the stored file, scales it to fit a
-bounded box, and returns JPEG bytes — handy for avatar grids without a
-separate image pipeline.
+`image::generate_thumbnail` decodes the stored file, scales it to fit a bounded
+box, and returns JPEG bytes — handy for avatar grids without a separate image
+pipeline.

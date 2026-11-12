@@ -19,17 +19,16 @@ All entries, newest first (array of `LogEntry`).
 `message` required (`400` if empty); `level` defaults to `info` when empty;
 `meta` is an optional JSON string.
 
-**Response `201`** — the `LogEntry`. Broadcasts on `/api/logs/stream` and
-fires `log.create` webhooks.
+**Response `201`** — the `LogEntry`. Broadcasts on `/api/logs/stream` and fires
+`log.create` webhooks.
 
 ## `DELETE /api/logs` — clear
 
-Wipe all entries. `200` → `{"status": "cleared"}` (same shape as
-notifications).
+Wipe all entries. `200` → `{"status": "cleared"}` (same shape as notifications).
 
 ## `GET /api/logs/stream` — SSE
 
-Unauthenticated server-sent stream; each new entry arrives as a `data:`
-event with the `LogEntry` JSON. See
-[Notifications API](notifications.md#api-notificationsstream--sse) for the
-same pattern.
+Unauthenticated server-sent stream; each new entry arrives as a `data:` event
+with the `LogEntry` JSON. See
+[Notifications API](notifications.md#api-notificationsstream--sse) for the same
+pattern.

@@ -1,8 +1,8 @@
 # Cron jobs
 
-Cron jobs fire HTTP requests on a schedule — PocketBase's "cron" equivalent
-plus what Supabase Edge Functions cron does, minus the function runtime.
-Blazers doesn't run shell commands; a "job" is an outbound HTTP call.
+Cron jobs fire HTTP requests on a schedule — PocketBase's "cron" equivalent plus
+what Supabase Edge Functions cron does, minus the function runtime. Blazers
+doesn't run shell commands; a "job" is an outbound HTTP call.
 
 ## Model
 
@@ -28,14 +28,13 @@ Blazers doesn't run shell commands; a "job" is an outbound HTTP call.
   `*/30 * * * * *` every 30 s, `0 0 9 * * 1-5` weekdays at 09:00.
 - `command` is the target URL; `method` is `GET`/`POST`/`PUT`/`PATCH`/`DELETE`
   (anything else falls back to GET).
-- `headers` is a JSON object string; `body` is sent for
-  POST/PUT/PATCH.
+- `headers` is a JSON object string; `body` is sent for POST/PUT/PATCH.
 
 ## Execution
 
-A scheduler task ticks every 30 s, finds jobs whose cron expression is due,
-and executes them (`cronjobs::execute_cron_job`). Each run writes a
-`cron_job_logs` row:
+A scheduler task ticks every 30 s, finds jobs whose cron expression is due, and
+executes them (`cronjobs::execute_cron_job`). Each run writes a `cron_job_logs`
+row:
 
 ```json
 {
@@ -66,8 +65,8 @@ and executes them (`cronjobs::execute_cron_job`). Each run writes a
 
 ## Webhooks
 
-`cronjob.create`, `cronjob.update`, and `cronjob.delete` events fire
-webhooks with `{"cronjob": {...}}` payloads.
+`cronjob.create`, `cronjob.update`, and `cronjob.delete` events fire webhooks
+with `{"cronjob": {...}}` payloads.
 
 ## Typical uses
 
