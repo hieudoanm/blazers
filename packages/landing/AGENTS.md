@@ -53,3 +53,12 @@ pnpm run build   # static export → out/ (uploaded to Pages by CI)
   `pnpm-lock.yaml` — commit lockfile changes.
 - **Deploy:** CI builds `out/` and uploads via `upload-pages-artifact` +
   `deploy-pages` (see `.github/workflows/ci.yaml`, `pages` job).
+
+## Footer
+
+The footer follows the shared contract via `src/components/Footer.tsx`:
+`© {year} {repo-name}` (lowercase repo name, `new Date().getFullYear()`),
+a one-line tagline/license descriptor, and a right-aligned
+`<nav aria-label="Footer">` with exactly two links — `GitHub` (repo root)
+and `README` (`<repo>#readme`), both `target="_blank" rel="noreferrer"`.
+Reuse the component on every page that shows a footer.

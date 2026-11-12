@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { DOC_SECTIONS, getDocPages, type DocPage } from '@/lib/docs';
+import Footer from '@/components/Footer';
 import type { JSX } from 'react';
 
 // next/image with unoptimized does not apply basePath — mirror next.config.ts.
@@ -101,18 +102,7 @@ const DocsPage = async ({ params }: DocsPageProps): Promise<JSX.Element> => {
         </div>
       </div>
 
-      <footer className='border-border text-text-muted border-t py-10 text-sm'>
-        <div className='mx-auto w-full max-w-[72rem] px-5'>
-          blazers — blazing fast Back-end as a Service ·{' '}
-          <Link
-            href='https://github.com/hieudoanm/blazers'
-            target='_blank'
-            rel='noreferrer'
-            className='text-text-muted hover:text-text no-underline'>
-            GitHub
-          </Link>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 };
