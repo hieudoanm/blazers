@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/hieudoanm/blazers/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/hieudoanm/blazers/actions/workflows/ci.yaml?branch=master)  [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-keywords: `baaas`, `backend-as-a-service`, `rust`, `sqlite`, `axum`, `mcp`, `self-hosted`
+Topics: `baaas`, `backend-as-a-service`, `rust`, `sqlite`, `axum`, `mcp`, `self-hosted`
 
 
 **Blazing fast Back-end as a Service** — a single Rust binary that gives you
