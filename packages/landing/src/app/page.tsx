@@ -125,9 +125,6 @@ const TERM_FIGURE =
   'm-0 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 shadow-xl';
 const TERM_CAPTION =
   'border-b border-gray-800 bg-slate-950 px-3.5 pt-2 pb-2.5 text-xs text-slate-400';
-const TERM_PRE =
-  'm-0 overflow-x-auto px-5 py-4 font-mono text-xs leading-relaxed text-gray-200 whitespace-pre tabular-nums';
-
 interface TermProps {
   caption: string;
   lines: Tok[][];
@@ -136,17 +133,23 @@ interface TermProps {
 const Term: FC<TermProps> = ({ caption, lines }) => (
   <figure className={TERM_FIGURE}>
     <figcaption className={TERM_CAPTION}>{caption}</figcaption>
-    <pre className={TERM_PRE}>
-      {lines.map((line, i) => (
-        <span key={i} className="block min-h-[1.7em]">
-          {line.map((tok, j) => (
-            <span key={j} className={TK[tok.c ?? 'ok']}>
-              {tok.t}
-            </span>
-          ))}
-        </span>
-      ))}
-    </pre>
+    <div className="mockup-code rounded-none">
+      {lines.map((line, i) => {
+        const prompt = line[0]?.c === 'prompt' ? line[0].t.trim() : null;
+        const tokens = prompt ? line.slice(1) : line;
+        return (
+          <pre key={i} {...(prompt ? { 'data-prefix': prompt } : {})}>
+            <code>
+              {tokens.map((tok, j) => (
+                <span key={j} className={TK[tok.c ?? 'ok']}>
+                  {tok.t}
+                </span>
+              ))}
+            </code>
+          </pre>
+        );
+      })}
+    </div>
   </figure>
 );
 
