@@ -96,6 +96,20 @@ const addHeadingIds = (html: string): string => {
   });
 };
 
+/** Generated SVG diagrams can't take utilities — frame them via class injection. */
+const SVG_CLASS =
+  'my-4 max-w-full rounded-2xl border border-gray-200 bg-gray-50 p-4';
+
+const frameSvgs = (html: string): string => {
+  return html.replace(/<svg\b([^>]*)>/g, (match, attrs: string) => {
+    const cls = attrs.match(/class="([^"]*)"/);
+    if (cls) {
+      return match.replace(`class="${cls[1]}"`, `class="${SVG_CLASS} ${cls[1]}"`);
+    }
+    return `<svg class="${SVG_CLASS}"${attrs}>`;
+  });
+};
+
 export const getDocPages = (): DocPage[] => {
   const files: string[] = [];
   walk(DOCS_DIR, '', files);
@@ -109,7 +123,7 @@ export const getDocPages = (): DocPage[] => {
       slug,
       title: titleFor(markdown, file),
       section,
-      html: addHeadingIds(rewriteLinks(raw, slug)),
+      html: frameSvgs(addHeadingIds(rewriteLinks(raw, slug))),
     };
   });
 };

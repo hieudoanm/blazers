@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import type { FC, ReactNode } from 'react';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://hieudoanm.github.io/blazers/'),
@@ -30,8 +30,11 @@ interface RootLayoutProps {
 }
 
 const RootLayout: FC<RootLayoutProps> = ({ children }) => (
-  <html lang='en' className={inter.variable}>
-    <body>{children}</body>
+  <html
+    lang='en'
+    data-theme='blazers'
+    className={`scroll-smooth antialiased motion-reduce:scroll-auto ${inter.className}`}>
+    <body className='m-0 bg-base-100 text-base-content leading-relaxed'>{children}</body>
   </html>
 );
 

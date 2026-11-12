@@ -15,8 +15,9 @@ GitHub Pages at `https://hieudoanm.github.io/blazers` (project site —
   quickstart terminals, CTA, footer)
 - `src/app/docs/[[...slug]]/page.tsx` — docs catch-all; renders every Markdown
   file under `docs/` as a static page at `/blazers/docs/<path>/`
-- `src/app/globals.css` — Tailwind v4 `@theme` design tokens + `.docs-content`
-  markdown styles + `.btn`/`.terminal` shared components
+- `src/app/globals.css` — `@import 'tailwindcss'` + official plugins only:
+  `@tailwindcss/typography` for docs prose and DaisyUI with a custom
+  `blazers` theme (see Styling below)
 - `lib/docs.ts` — Markdown → HTML pipeline (`marked`), relative-link
   rewriting to `/blazers/docs/*`, GitHub-style heading ids
 - `docs/` — documentation source (moved from the repo-root `docs/`)
@@ -41,10 +42,11 @@ pnpm run build   # static export → out/ (uploaded to Pages by CI)
 - **`basePath`/`assetPrefix` are `/blazers`.** `next/link` and metadata get
   it automatically; raw `<a href>` and generated HTML links must include it
   (see `BASE_PATH` in `lib/docs.ts`).
-- **Tailwind v4 tokens** live in `@theme` in `globals.css` — use
-  `bg-bg-alt`, `text-text-muted`, `text-accent`, `border-border`, etc.
-  Accent is flame orange (`--color-accent: #c2410c` family); terminals stay
-  dark (`--color-terminal-*`).
+- **DaisyUI + Tailwind v4** — `globals.css` has only `@import 'tailwindcss'`
+  plus official plugins; the `blazers` theme (set via `data-theme` on
+  `<html>`) maps `primary` to flame orange (`#c2410c`). Use DaisyUI
+  components (`btn`, `badge`, `card`) and theme tokens (`bg-base-100`,
+  `text-base-content`, `text-primary`, `bg-primary/10`) — no custom CSS.
 - **Docs are Markdown**, rendered at build time — no MDX, no client JS.
   Links between docs use relative `.md` paths; `lib/docs.ts` rewrites them.
   Links escaping the docs tree (e.g. `../../README.md`) are pointed at the
@@ -70,3 +72,15 @@ as `Footer`). Features: centered head (h2 + supporting p), responsive
 card grid, card = icon chip + h3 + p. CTA: alt/surface background, centered
 h2 + p, primary action button plus at most one ghost button. Keep copy and
 link targets per-repo; keep the structure shared.
+
+## Styling
+
+Tailwind CSS only. `globals.css` contains just `@import 'tailwindcss';` plus
+official plugins where required (`@tailwindcss/typography` for docs prose,
+DaisyUI in fdr). No `@theme`, `@layer`, `@utility`, or custom selectors — style
+with utilities in `className` — no shared class-string modules.
+Inter comes from `next/font` `className` on `<html>`; smooth scroll uses
+`scroll-smooth motion-reduce:scroll-auto`. Markdown-rendered HTML gets utility
+classes emitted by `lib/docs.ts`, never custom CSS. Inline `style={{}}` is only
+for genuinely dynamic values.
+

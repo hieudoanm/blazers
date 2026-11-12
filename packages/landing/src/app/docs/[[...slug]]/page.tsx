@@ -38,19 +38,19 @@ const DocsPage = async ({ params }: DocsPageProps): Promise<JSX.Element> => {
 
   return (
     <>
-      <header className='border-border bg-bg/90 sticky top-0 z-50 border-b backdrop-blur'>
-        <div className='mx-auto flex h-16 w-full max-w-[72rem] items-center gap-6 px-5'>
+      <header className='border-gray-200 bg-white/90 sticky top-0 z-50 border-b backdrop-blur'>
+        <div className='mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5'>
           <Link
             href='/'
-            className='text-text flex items-center gap-2 text-lg font-bold no-underline'>
+            className='text-gray-900 flex items-center gap-2 text-lg font-bold no-underline'>
             <Image src={LOGO} alt='' width={28} height={28} className='rounded-md' />
             <span>blazers</span>
           </Link>
-          <nav className='ml-auto flex items-center gap-5 text-[0.9375rem]'>
-            <Link href='/' className='text-text-muted hover:text-text no-underline'>
+          <nav className='ml-auto flex items-center gap-5 text-sm'>
+            <Link href='/' className='text-gray-500 hover:text-gray-900 no-underline'>
               Home
             </Link>
-            <Link href='/docs/' className='text-accent font-semibold no-underline'>
+            <Link href='/docs/' className='text-primary font-semibold no-underline'>
               Docs
             </Link>
             <Link
@@ -64,16 +64,16 @@ const DocsPage = async ({ params }: DocsPageProps): Promise<JSX.Element> => {
         </div>
       </header>
 
-      <div className='mx-auto w-full max-w-[72rem] px-5 py-10'>
-        <div className='docs-layout grid grid-cols-[16rem_1fr] gap-10'>
-          <aside className='docs-sidebar'>
-            <Link href='/docs/' className='text-text text-sm font-bold no-underline'>
+      <div className='mx-auto w-full max-w-6xl px-5 py-10'>
+        <div className='grid grid-cols-1 gap-10 md:grid-cols-[16rem_1fr]'>
+          <aside className='hidden md:block'>
+            <Link href='/docs/' className='text-gray-900 text-sm font-bold no-underline'>
               Documentation
             </Link>
             {overview && (
               <Link
                 href='/docs/'
-                className={`docs-nav-link mt-2 block ${doc.slug === '' ? 'active' : ''}`}>
+                className={`mt-2 block rounded-lg px-3 py-1.5 text-sm no-underline ${doc.slug === '' ? 'bg-primary/10 font-semibold text-primary' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}>
                 {overview.title}
               </Link>
             )}
@@ -82,12 +82,12 @@ const DocsPage = async ({ params }: DocsPageProps): Promise<JSX.Element> => {
               if (items.length === 0) return null;
               return (
                 <div key={s.id}>
-                  <div className='docs-nav-section'>{s.label}</div>
+                  <div className='mt-5 mb-1.5 text-xs font-semibold tracking-wider text-gray-400 uppercase'>{s.label}</div>
                   {items.map((p) => (
                     <Link
                       key={p.slug}
                       href={`/docs/${p.slug}/`}
-                      className={`docs-nav-link ${p.slug === doc.slug ? 'active' : ''}`}>
+                      className={`block rounded-lg px-3 py-1.5 text-sm no-underline ${p.slug === doc.slug ? 'bg-primary/10 font-semibold text-primary' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}>
                       {p.title}
                     </Link>
                   ))}
@@ -97,7 +97,7 @@ const DocsPage = async ({ params }: DocsPageProps): Promise<JSX.Element> => {
           </aside>
 
           <article>
-            <div className='docs-content' dangerouslySetInnerHTML={{ __html: doc.html }} />
+            <div className='prose max-w-none' dangerouslySetInnerHTML={{ __html: doc.html }} />
           </article>
         </div>
       </div>

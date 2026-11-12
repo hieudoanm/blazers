@@ -1,26 +1,45 @@
 import Link from 'next/link';
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 
-const GITHUB = 'https://github.com/hieudoanm/blazers';
+export interface CTALink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
 
-const CTA: FC = () => (
-  <section className='bg-bg-alt py-20'>
-    <div className='mx-auto w-full max-w-[72rem] px-5 text-center'>
-      <h2>Give your next side project a real backend.</h2>
-      <p className='text-text-muted mt-3 text-[1.0625rem]'>
-        Self-host it, embed it, or point your AI agent at it over MCP.
-      </p>
+interface CTAProps {
+  title: string;
+  description: ReactNode;
+  primary: CTALink;
+  secondary?: CTALink;
+}
+
+const CTAButton: FC<{ link: CTALink; className: string }> = ({
+  link,
+  className,
+}) =>
+  link.external ? (
+    <a href={link.href} target='_blank' rel='noreferrer' className={className}>
+      {link.label}
+    </a>
+  ) : (
+    <Link href={link.href} className={className}>
+      {link.label}
+    </Link>
+  );
+
+const CTA: FC<CTAProps> = ({ title, description, primary, secondary }) => (
+  <section className='bg-base-200 py-20'>
+    <div className='mx-auto w-full max-w-6xl px-5 text-center'>
+      <h2 className='m-0 text-3xl leading-tight font-bold tracking-normal text-balance text-base-content'>
+        {title}
+      </h2>
+      <div className='text-base-content/60 mt-3 text-lg'>{description}</div>
       <div className='mt-8 flex flex-wrap justify-center gap-3'>
-        <Link
-          href={GITHUB}
-          target='_blank'
-          rel='noreferrer'
-          className='btn btn-primary btn-lg'>
-          Star on GitHub
-        </Link>
-        <Link href='/docs/' className='btn btn-ghost btn-lg'>
-          Read the docs
-        </Link>
+        <CTAButton link={primary} className='btn btn-accent btn-lg' />
+        {secondary && (
+          <CTAButton link={secondary} className='btn btn-outline btn-lg' />
+        )}
       </div>
     </div>
   </section>

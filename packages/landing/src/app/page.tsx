@@ -3,8 +3,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { FC } from 'react';
 import Footer from '@/components/Footer';
-import Features from '@/components/Features';
+import Features, { type Feature } from '@/components/Features';
 import CTA from '@/components/CTA';
+import {
+  LuBookOpen,
+  LuCpu,
+  LuDatabase,
+  LuFolderUp,
+  LuKeyRound,
+  LuLayoutDashboard,
+  LuLock,
+  LuWebhook,
+  LuZap,
+} from 'react-icons/lu';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/' },
@@ -97,16 +108,23 @@ interface Tok {
 }
 
 const TK: Record<TokKind, string> = {
-  prompt: 'prompt',
-  cmd: 'tk-cmd',
-  flag: 'tk-flag',
-  str: 'tk-str',
-  key: 'tk-key',
-  url: 'tk-url',
-  dim: 'tk-dim',
-  ok: 'tk-ok',
-  err: 'tk-err',
+  prompt: 'text-accent select-none',
+  cmd: 'font-semibold text-sky-300',
+  flag: 'text-amber-400',
+  str: 'text-green-300',
+  key: 'text-violet-300',
+  url: 'text-cyan-300',
+  dim: 'text-slate-400',
+  ok: 'text-gray-200',
+  err: 'text-red-400',
 };
+
+const TERM_FIGURE =
+  'm-0 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 shadow-xl';
+const TERM_CAPTION =
+  'border-b border-gray-800 bg-slate-950 px-3.5 pt-2 pb-2.5 text-xs text-slate-400';
+const TERM_PRE =
+  'm-0 overflow-x-auto px-5 py-4 font-mono text-xs leading-relaxed text-gray-200 whitespace-pre tabular-nums';
 
 interface TermProps {
   caption: string;
@@ -114,11 +132,11 @@ interface TermProps {
 }
 
 const Term: FC<TermProps> = ({ caption, lines }) => (
-  <figure className='terminal'>
-    <figcaption>{caption}</figcaption>
-    <pre>
+  <figure className={TERM_FIGURE}>
+    <figcaption className={TERM_CAPTION}>{caption}</figcaption>
+    <pre className={TERM_PRE}>
       {lines.map((line, i) => (
-        <span key={i} className='tk-line'>
+        <span key={i} className='block min-h-[1.7em]'>
           {line.map((tok, j) => (
             <span key={j} className={TK[tok.c ?? 'ok']}>
               {tok.t}
@@ -130,35 +148,83 @@ const Term: FC<TermProps> = ({ caption, lines }) => (
   </figure>
 );
 
+const FEATURES: Feature[] = [
+  {
+    title: 'Auth & permissions',
+    body: 'Register, login, JWT bearer tokens, bcrypt passwords and a per-collection permission system — public, user and admin rules enforced on every request.',
+    icon: LuLock,
+  },
+  {
+    title: 'Collections & records',
+    body: 'Schema-less collections stored as dynamic SQLite tables. Full CRUD with paging, search, sorting and JSON-schema validation.',
+    icon: LuDatabase,
+  },
+  {
+    title: 'File buckets',
+    body: 'Public and private buckets, streaming uploads, downloads and on-the-fly image thumbnails — files live next to the database.',
+    icon: LuFolderUp,
+  },
+  {
+    title: 'Realtime',
+    body: 'WebSocket hub plus Server-Sent Events streams for notifications, logs and pub/sub topics — subscribe from any browser or client.',
+    icon: LuZap,
+  },
+  {
+    title: 'Webhooks & cron',
+    body: 'HMAC-signed webhook delivery with logs, and scheduled HTTP jobs managed entirely through the API — no code required.',
+    icon: LuWebhook,
+  },
+  {
+    title: 'Secrets vault & cache',
+    body: 'AES-256-GCM encrypted key/value store for credentials, plus a Redis-style cache — strings, lists, hashes, atomic INCR/APPEND, TTL — persisted to SQLite.',
+    icon: LuKeyRound,
+  },
+  {
+    title: 'Admin dashboard',
+    body: 'An HTMX admin UI embedded in the binary at / — manage collections, records, files, webhooks, secrets and cron jobs from the browser. No build step.',
+    icon: LuLayoutDashboard,
+  },
+  {
+    title: 'MCP server',
+    body: 'blazers mcp serve exposes collections and records as Model Context Protocol tools — let an AI agent read and write your backend over stdio.',
+    icon: LuCpu,
+  },
+  {
+    title: 'OpenAPI & SDK-ready',
+    body: 'Swagger UI at /api/docs, a runtime-generated OpenAPI spec, JSON import/export snapshots and a backup endpoint.',
+    icon: LuBookOpen,
+  },
+];
+
 const Home: NextPage = () => (
   <>
-    <header className='border-border bg-bg/90 sticky top-0 z-50 border-b backdrop-blur'>
-      <div className='mx-auto flex h-16 w-full max-w-[72rem] items-center gap-6 px-5'>
+    <header className='border-gray-200 bg-white/90 sticky top-0 z-50 border-b backdrop-blur'>
+      <div className='mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5'>
         <Link
           href='#top'
-          className='text-text flex items-center gap-2 text-lg font-bold no-underline'>
+          className='text-gray-900 flex items-center gap-2 text-lg font-bold no-underline'>
           <Image src={LOGO} alt='' width={28} height={28} className='rounded-md' />
           <span>blazers</span>
         </Link>
         <nav className='ml-auto hidden items-center gap-5 lg:flex'>
           <Link
             href='#features'
-            className='text-text-muted hover:text-text text-[0.9375rem] no-underline'>
+            className='text-gray-500 hover:text-gray-900 text-sm no-underline'>
             Features
           </Link>
           <Link
             href='#compare'
-            className='text-text-muted hover:text-text text-[0.9375rem] no-underline'>
+            className='text-gray-500 hover:text-gray-900 text-sm no-underline'>
             vs PocketBase
           </Link>
           <Link
             href='#quickstart'
-            className='text-text-muted hover:text-text text-[0.9375rem] no-underline'>
+            className='text-gray-500 hover:text-gray-900 text-sm no-underline'>
             Quickstart
           </Link>
           <Link
             href='/docs/'
-            className='text-text-muted hover:text-text text-[0.9375rem] no-underline'>
+            className='text-gray-500 hover:text-gray-900 text-sm no-underline'>
             Docs
           </Link>
         </nav>
@@ -171,10 +237,10 @@ const Home: NextPage = () => (
     <main id='top'>
       {/* hero */}
       <section className='pt-20 pb-16'>
-        <div className='mx-auto grid w-full max-w-[72rem] items-center gap-12 px-5 text-left lg:grid-cols-[1.05fr_1fr]'>
+        <div className='mx-auto grid w-full max-w-6xl items-center gap-12 px-5 text-left lg:grid-cols-[1.05fr_1fr]'>
           <div>
-            <h1>Your whole backend, in one blazing fast binary.</h1>
-            <p className='text-text-muted mt-6 max-w-xl text-[1.1875rem]'>
+            <h1 className='m-0 text-3xl md:text-5xl leading-tight tracking-tight text-balance'>Your whole backend, in one blazing fast binary.</h1>
+            <p className='text-gray-500 mt-6 max-w-xl text-xl'>
               Blazers is a Back-end as a Service written in Rust: auth, a schema-less database, file
               storage, realtime streams, webhooks, cron jobs, encrypted secrets, pub/sub and an
               admin dashboard — all persisted to a single SQLite file. No Docker, no accounts, no
@@ -184,22 +250,22 @@ const Home: NextPage = () => (
               <Link href='#quickstart' className='btn btn-primary btn-lg'>
                 Get started
               </Link>
-              <Link href={GITHUB} target='_blank' rel='noreferrer' className='btn btn-ghost btn-lg'>
+              <Link href={GITHUB} target='_blank' rel='noreferrer' className='btn btn-outline btn-lg'>
                 Source on GitHub
               </Link>
             </div>
             <dl className='mt-10 grid grid-cols-3 gap-6'>
               <div>
                 <dt className='text-2xl font-bold tabular-nums'>1</dt>
-                <dd className='text-text-muted m-0 text-sm'>binary</dd>
+                <dd className='text-gray-500 m-0 text-sm'>binary</dd>
               </div>
               <div>
                 <dt className='text-2xl font-bold tabular-nums'>1</dt>
-                <dd className='text-text-muted m-0 text-sm'>SQLite file</dd>
+                <dd className='text-gray-500 m-0 text-sm'>SQLite file</dd>
               </div>
               <div>
                 <dt className='text-2xl font-bold tabular-nums'>20+</dt>
-                <dd className='text-text-muted m-0 text-sm'>API features</dd>
+                <dd className='text-gray-500 m-0 text-sm'>API features</dd>
               </div>
             </dl>
           </div>
@@ -257,39 +323,43 @@ const Home: NextPage = () => (
         </div>
       </section>
 
-      <Features />
+      <Features
+        title="Everything a BaaS should do — nothing it shouldn't."
+        description='Modelled on PocketBase&apos;s "one file, one binary" philosophy and Supabase&apos;s feature breadth, shipped as a Cargo workspace you can audit crate by crate.'
+        features={FEATURES}
+      />
 
 
       {/* compare */}
-      <section id='compare' className='bg-bg-alt py-20'>
-        <div className='mx-auto w-full max-w-[72rem] px-5'>
-          <div className='mx-auto mb-12 max-w-[44rem] text-center'>
-            <h2>Same ideas as PocketBase — more of Supabase&apos;s surface.</h2>
-            <p className='text-text-muted mt-3 text-[1.0625rem]'>
+      <section id='compare' className='bg-gray-50 py-20'>
+        <div className='mx-auto w-full max-w-6xl px-5'>
+          <div className='mx-auto mb-12 max-w-2xl text-center'>
+            <h2 className='m-0 text-3xl leading-tight tracking-normal text-balance'>Same ideas as PocketBase — more of Supabase&apos;s surface.</h2>
+            <p className='text-gray-500 mt-3 text-lg'>
               One binary and one SQLite file like PocketBase; auth, storage, realtime,
               functions-adjacent jobs and an admin UI like Supabase — without Postgres, GoTrue or a
               fleet of services.
             </p>
           </div>
-          <div className='border-border overflow-x-auto rounded-[var(--radius-card)] border'>
-            <table className='w-full border-collapse text-[0.9375rem] [&_tbody_tr:last-child>td]:border-b-0'>
+          <div className='border-gray-200 overflow-x-auto rounded-2xl border'>
+            <table className='w-full border-collapse text-sm [&_tbody_tr:last-child>td]:border-b-0'>
               <thead>
                 <tr>
-                  <th className='border-border bg-bg-alt w-44 border-b px-5 py-3.5 text-left align-bottom font-semibold'>
+                  <th className='border-gray-200 bg-gray-50 w-44 border-b px-5 py-3.5 text-left align-bottom font-semibold'>
                     Feature
                   </th>
-                  <th className='border-border bg-bg-alt border-b border-l px-5 py-3.5 text-left align-bottom font-semibold'>
+                  <th className='border-gray-200 bg-gray-50 border-b border-l px-5 py-3.5 text-left align-bottom font-semibold'>
                     PocketBase
                   </th>
-                  <th className='border-border bg-accent-soft border-b border-l px-5 py-3.5 text-left align-bottom'>
-                    <span className='text-accent flex items-center gap-2 font-bold'>
+                  <th className='border-gray-200 bg-primary/10 border-b border-l px-5 py-3.5 text-left align-bottom'>
+                    <span className='text-primary flex items-center gap-2 font-bold'>
                       Blazers
-                      <span className='bg-accent rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold tracking-wide text-white uppercase'>
+                      <span className='badge badge-primary uppercase'>
                         rust
                       </span>
                     </span>
                   </th>
-                  <th className='border-border bg-bg-alt border-b border-l px-5 py-3.5 text-left align-bottom font-semibold'>
+                  <th className='border-gray-200 bg-gray-50 border-b border-l px-5 py-3.5 text-left align-bottom font-semibold'>
                     Supabase
                   </th>
                 </tr>
@@ -297,16 +367,16 @@ const Home: NextPage = () => (
               <tbody>
                 {COMPARE.map((row) => (
                   <tr key={row.feature} className='group'>
-                    <td className='border-border text-text-muted border-b px-5 py-3.5 align-top font-medium'>
+                    <td className='border-gray-200 text-gray-500 border-b px-5 py-3.5 align-top font-medium'>
                       {row.feature}
                     </td>
-                    <td className='border-border text-text-muted border-b border-l px-5 py-3.5 align-top'>
+                    <td className='border-gray-200 text-gray-500 border-b border-l px-5 py-3.5 align-top'>
                       {row.pb}
                     </td>
-                    <td className='border-border bg-accent-soft/50 text-text group-hover:bg-accent-soft border-b border-l px-5 py-3.5 align-top font-medium'>
+                    <td className='border-gray-200 bg-primary/5 text-gray-900 group-hover:bg-primary/10 border-b border-l px-5 py-3.5 align-top font-medium'>
                       {row.bz}
                     </td>
-                    <td className='border-border text-text-muted border-b border-l px-5 py-3.5 align-top'>
+                    <td className='border-gray-200 text-gray-500 border-b border-l px-5 py-3.5 align-top'>
                       {row.sb}
                     </td>
                   </tr>
@@ -314,7 +384,7 @@ const Home: NextPage = () => (
               </tbody>
             </table>
           </div>
-          <p className='text-text-muted mt-4 text-center text-sm'>
+          <p className='text-gray-500 mt-4 text-center text-sm'>
             Comparing deployment model, auth, storage, realtime and ops surface — not raw
             throughput. Blazers aims for PocketBase&apos;s simplicity with more of Supabase&apos;s
             feature set.
@@ -324,12 +394,12 @@ const Home: NextPage = () => (
 
       {/* quickstart */}
       <section id='quickstart' className='py-20'>
-        <div className='mx-auto w-full max-w-[72rem] px-5'>
-          <div className='mx-auto mb-12 max-w-[44rem] text-center'>
-            <h2>Up and running in under a minute.</h2>
-            <p className='text-text-muted mt-3 text-[1.0625rem]'>
+        <div className='mx-auto w-full max-w-6xl px-5'>
+          <div className='mx-auto mb-12 max-w-2xl text-center'>
+            <h2 className='m-0 text-3xl leading-tight tracking-normal text-balance'>Up and running in under a minute.</h2>
+            <p className='text-gray-500 mt-3 text-lg'>
               Prebuilt binaries on the{' '}
-              <Link href={`${GITHUB}/releases`} className='text-accent'>
+              <Link href={`${GITHUB}/releases`} className='text-primary'>
                 releases page
               </Link>
               , or build from source with Cargo.
@@ -423,18 +493,23 @@ const Home: NextPage = () => (
               ]}
             />
           </div>
-          <p className='text-text-muted mt-8 text-center text-[0.9375rem]'>
-            Dashboard at <code>/</code> · API docs at <code>/api/docs</code> · Full docs at{' '}
-            <Link href='/docs/' className='text-accent'>
+          <p className='text-gray-500 mt-8 text-center text-sm'>
+            Dashboard at <code className='rounded border border-gray-200 bg-gray-50 px-1 py-px font-mono text-sm'>/</code> · API docs at <code className='rounded border border-gray-200 bg-gray-50 px-1 py-px font-mono text-sm'>/api/docs</code> · Full docs at{' '}
+            <Link href='/docs/' className='text-primary'>
               /docs
             </Link>{' '}
-            · MCP server: <code>blazers mcp serve</code>. Data in <code>~/.blazers/</code> — set{' '}
-            <code>BLAZERS_DATA</code>, <code>PORT</code> and <code>JWT_SECRET</code> to configure.
+            · MCP server: <code className='rounded border border-gray-200 bg-gray-50 px-1 py-px font-mono text-sm'>blazers mcp serve</code>. Data in <code className='rounded border border-gray-200 bg-gray-50 px-1 py-px font-mono text-sm'>~/.blazers/</code> — set{' '}
+            <code className='rounded border border-gray-200 bg-gray-50 px-1 py-px font-mono text-sm'>BLAZERS_DATA</code>, <code className='rounded border border-gray-200 bg-gray-50 px-1 py-px font-mono text-sm'>PORT</code> and <code className='rounded border border-gray-200 bg-gray-50 px-1 py-px font-mono text-sm'>JWT_SECRET</code> to configure.
           </p>
         </div>
       </section>
 
-      <CTA />
+      <CTA
+        title="Give your next side project a real backend."
+        description="Self-host it, embed it, or point your AI agent at it over MCP."
+        primary={{ label: 'Star on GitHub', href: GITHUB, external: true }}
+        secondary={{ label: 'Read the docs', href: '/docs/' }}
+      />
     </main>
 
     <Footer />
