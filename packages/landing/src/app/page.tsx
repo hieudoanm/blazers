@@ -121,36 +121,28 @@ const TK: Record<TokKind, string> = {
   err: 'text-red-400',
 };
 
-const TERM_FIGURE =
-  'm-0 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 shadow-xl';
-const TERM_CAPTION =
-  'border-b border-gray-800 bg-slate-950 px-3.5 pt-2 pb-2.5 text-xs text-slate-400';
-interface TermProps {
-  caption: string;
+interface TerminalProps {
   lines: Tok[][];
 }
 
-const Term: FC<TermProps> = ({ caption, lines }) => (
-  <figure className={TERM_FIGURE}>
-    <figcaption className={TERM_CAPTION}>{caption}</figcaption>
-    <div className="mockup-code rounded-none">
-      {lines.map((line, i) => {
-        const prompt = line[0]?.c === 'prompt' ? line[0].t.trim() : null;
-        const tokens = prompt ? line.slice(1) : line;
-        return (
-          <pre key={i} {...(prompt ? { 'data-prefix': prompt } : {})}>
-            <code>
-              {tokens.map((tok, j) => (
-                <span key={j} className={TK[tok.c ?? 'ok']}>
-                  {tok.t}
-                </span>
-              ))}
-            </code>
-          </pre>
-        );
-      })}
-    </div>
-  </figure>
+const Terminal: FC<TerminalProps> = ({ lines }) => (
+  <div className="mockup-code">
+    {lines.map((line, i) => {
+      const prompt = line[0]?.c === 'prompt' ? line[0].t.trim() : null;
+      const tokens = prompt ? line.slice(1) : line;
+      return (
+        <pre key={i} {...(prompt ? { 'data-prefix': prompt } : {})}>
+          <code>
+            {tokens.map((tok, j) => (
+              <span key={j} className={TK[tok.c ?? 'ok']}>
+                {tok.t}
+              </span>
+            ))}
+          </code>
+        </pre>
+      );
+    })}
+  </div>
 );
 
 const FEATURES: Feature[] = [
@@ -215,8 +207,7 @@ const Home: NextPage = () => (
           { value: '1', label: 'SQLite file' },
           { value: '20+', label: 'API features' },
         ]}>
-        <Term
-          caption="zero to backend"
+        <Terminal
           lines={[
             [
               { t: '$ ', c: 'prompt' },
@@ -358,8 +349,7 @@ const Home: NextPage = () => (
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <Term
-              caption="build from source"
+            <Terminal
               lines={[
                 [
                   { t: '$ ', c: 'prompt' },
@@ -398,8 +388,7 @@ const Home: NextPage = () => (
                 ],
               ]}
             />
-            <Term
-              caption="first API calls"
+            <Terminal
               lines={[
                 [
                   { t: '$ ', c: 'prompt' },
