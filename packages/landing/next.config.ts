@@ -10,7 +10,6 @@ const nextConfig: NextConfig = {
       },
     },
   },
-
   output: 'export',
   trailingSlash: true,
   // GitHub Pages project site lives under /blazers/
