@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { FC } from 'react';
 import Footer from '@/components/Footer';
 import Features, { type Feature } from '@/components/Features';
+import Hero from '@/components/Hero';
 import CTA from '@/components/CTA';
 import {
   LuBookOpen,
@@ -236,40 +237,17 @@ const Home: NextPage = () => (
 
     <main id='top'>
       {/* hero */}
-      <section className='pt-20 pb-16'>
-        <div className='mx-auto grid w-full max-w-6xl items-center gap-12 px-5 text-left lg:grid-cols-[1.05fr_1fr]'>
-          <div>
-            <h1 className='m-0 text-3xl md:text-5xl leading-tight tracking-tight text-balance'>Your whole backend, in one blazing fast binary.</h1>
-            <p className='text-gray-500 mt-6 max-w-xl text-xl'>
-              Blazers is a Back-end as a Service written in Rust: auth, a schema-less database, file
-              storage, realtime streams, webhooks, cron jobs, encrypted secrets, pub/sub and an
-              admin dashboard — all persisted to a single SQLite file. No Docker, no accounts, no
-              cloud.
-            </p>
-            <div className='mt-8 flex flex-wrap justify-start gap-3'>
-              <Link href='#quickstart' className='btn btn-primary btn-lg'>
-                Get started
-              </Link>
-              <Link href={GITHUB} target='_blank' rel='noreferrer' className='btn btn-outline btn-lg'>
-                Source on GitHub
-              </Link>
-            </div>
-            <dl className='mt-10 grid grid-cols-3 gap-6'>
-              <div>
-                <dt className='text-2xl font-bold tabular-nums'>1</dt>
-                <dd className='text-gray-500 m-0 text-sm'>binary</dd>
-              </div>
-              <div>
-                <dt className='text-2xl font-bold tabular-nums'>1</dt>
-                <dd className='text-gray-500 m-0 text-sm'>SQLite file</dd>
-              </div>
-              <div>
-                <dt className='text-2xl font-bold tabular-nums'>20+</dt>
-                <dd className='text-gray-500 m-0 text-sm'>API features</dd>
-              </div>
-            </dl>
-          </div>
-          <Term
+      <Hero
+        title='Your whole backend, in one blazing fast binary.'
+        description='Blazers is a Back-end as a Service written in Rust: auth, a schema-less database, file storage, realtime streams, webhooks, cron jobs, encrypted secrets, pub/sub and an admin dashboard — all persisted to a single SQLite file. No Docker, no accounts, no cloud.'
+        primary={{ label: 'Get started', href: '#quickstart' }}
+        secondary={{ label: 'Source on GitHub', href: GITHUB, external: true }}
+        stats={[
+          { value: '1', label: 'binary' },
+          { value: '1', label: 'SQLite file' },
+          { value: '20+', label: 'API features' },
+        ]}>
+                  <Term
             caption='zero to backend'
             lines={[
               [{ t: '$ ', c: 'prompt' }, { t: 'cargo', c: 'cmd' }, { t: ' install blazers' }],
@@ -320,8 +298,7 @@ const Home: NextPage = () => (
               [{ t: 'Swagger UI — every endpoint documented', c: 'dim' }],
             ]}
           />
-        </div>
-      </section>
+      </Hero>
 
       <Features
         title="Everything a BaaS should do — nothing it shouldn't."
