@@ -62,3 +62,11 @@ a one-line tagline/license descriptor, and a right-aligned
 `<nav aria-label="Footer">` with exactly two links — `GitHub` (repo root)
 and `README` (`<repo>#readme`), both `target="_blank" rel="noreferrer"`.
 Reuse the component on every page that shows a footer.
+
+## Features & CTA sections
+
+The landing page composes `Features` and `CTA` components (same directory
+as `Footer`). Features: centered head (h2 + supporting p), responsive
+card grid, card = icon chip + h3 + p. CTA: alt/surface background, centered
+h2 + p, primary action button plus at most one ghost button. Keep copy and
+link targets per-repo; keep the structure shared.
