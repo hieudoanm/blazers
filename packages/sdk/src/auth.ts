@@ -116,6 +116,17 @@ export class AuthClient {
       });
   }
 
+  /**
+   * Anonymous (guest) sign-in — creates a passwordless user and stores the
+   * session token. The user carries `data.is_anonymous = true`; link a real
+   * email + password later via {@link updateMe} (`email` + `password`).
+   */
+  async signInAnonymously(): Promise<LoginResponse> {
+    const res = await this.http.post<LoginResponse>('/api/auth/anonymous', {});
+    this.http.setToken(res.token);
+    return res;
+  }
+
   /** Browser redirect URL that starts the OAuth2 flow for `provider`. */
   oauthUrl(provider: string): string {
     return this.http.url(`/api/auth/oauth/${encodeURIComponent(provider)}`);

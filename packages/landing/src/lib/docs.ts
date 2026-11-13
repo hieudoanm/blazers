@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 const DOCS_DIR = path.join(process.cwd(), 'docs');
-const REPO_BLOB = 'https://github.com/hieudoanm/blazers/blob/main';
+const REPO_BLOB = 'https://github.com/hieudoanm/blazers/blob/master';
 // Must match basePath in next.config.ts (GitHub Pages project site).
 // Used in raw HTML hrefs, so basePath is not applied automatically.
 const BASE_PATH = process.env.NODE_ENV === 'production' ? '/blazers' : '';
@@ -28,6 +28,8 @@ export interface DocPage {
   html: string;
   /** h2+ headings for the "On this page" TOC */
   toc: DocHeading[];
+  /** Plain text (tags stripped) for full-text search */
+  text: string;
 }
 
 const walk = (dir: string, prefix: string, out: string[]): void => {
@@ -129,6 +131,26 @@ const frameSvgs = (html: string): string => {
   });
 };
 
+const ENTITIES: Record<string, string> = {
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&nbsp;': ' ',
+};
+
+/** HTML → plain text for the search index. */
+const toPlainText = (html: string): string => {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&(?:amp|lt|gt|quot|#39|nbsp);/g, (e) => ENTITIES[e] ?? e)
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 /** Pull h2+ headings (with their ids) out of rendered HTML for the TOC. */
 const extractToc = (html: string): DocHeading[] => {
   const toc: DocHeading[] = [];
@@ -160,18 +182,9 @@ export const getDocPages = (): DocPage[] => {
       section,
       html,
       toc: extractToc(html),
+      text: toPlainText(html),
     };
   });
 };
 
-export const DOC_SECTIONS: { id: string; label: string }[] = [
-  { id: 'getting-started', label: 'Getting started' },
-  { id: 'concepts', label: 'Concepts' },
-  { id: 'api-reference', label: 'API reference' },
-  { id: 'guides', label: 'Guides' },
-  { id: 'deployment', label: 'Deployment' },
-];
-
-export const sectionLabel = (id: string): string => {
-  return DOC_SECTIONS.find((s) => s.id === id)?.label ?? id;
-};
+export { DOC_SECTIONS, sectionLabel } from './sections';

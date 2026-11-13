@@ -56,7 +56,7 @@ const COMPARE_GROUPS: CompareGroup[] = [
       {
         feature: 'Typed collection schemas',
         pb: true,
-        bz: false,
+        bz: true,
         sb: true,
       },
       { feature: 'Record CRUD & querying', pb: true, bz: true, sb: true },
@@ -85,7 +85,7 @@ const COMPARE_GROUPS: CompareGroup[] = [
       { feature: 'OTP / magic-code login', pb: true, bz: true, sb: true },
       { feature: 'MFA (TOTP)', pb: true, bz: true, sb: true },
       { feature: 'User impersonation', pb: true, bz: true, sb: true },
-      { feature: 'Anonymous sign-in', pb: false, bz: false, sb: true },
+      { feature: 'Anonymous sign-in', pb: false, bz: true, sb: true },
       { feature: 'SSO / SAML', pb: false, bz: false, sb: true },
     ],
   },
@@ -153,7 +153,7 @@ const COMPARE_GROUPS: CompareGroup[] = [
       {
         feature: 'JS / edge-function runtime',
         pb: true,
-        bz: false,
+        bz: true,
         sb: true,
       },
       { feature: 'Cron jobs', pb: true, bz: true, sb: true },

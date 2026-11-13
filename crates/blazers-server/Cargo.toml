@@ -9,6 +9,7 @@ repository.workspace = true
 
 [dependencies]
 blazers-core = { path = "../blazers-core" }
+blazers-kv = { path = "../blazers-kv" }
 axum = { workspace = true, features = ["ws", "macros"] }
 tokio.workspace = true
 serde.workspace = true
@@ -38,6 +39,7 @@ image = "=0.25.10"
 futures = "=0.3.34"
 lettre = "=0.11.23"
 totp-rs = { version = "=6.0.0", features = ["gen_secret"] }
+rquickjs.workspace = true
 
 [dev-dependencies]
 tempfile = "=3.27.0"

@@ -34,6 +34,7 @@ pub async fn create_collection(
         .await
         .map_err(|e| AppError::Internal(e.to_string()))?;
     rbac::require_role(&conn, &claims.user_id, &req.name, "admin")?;
+    db::validate_schema(&req.schema)?;
     db::insert_collection(&conn, &req.name, &req.schema)?;
     db::create_collection_table(&conn, &req.name, &req.schema)?;
     let c = db::get_collection(&conn, &req.name)?
@@ -104,6 +105,9 @@ pub async fn update_collection(
         .await
         .map_err(|e| AppError::Internal(e.to_string()))?;
     rbac::require_role(&conn, &claims.user_id, &name, "admin")?;
+    if let Some(schema) = req.schema.as_deref() {
+        db::validate_schema(schema)?;
+    }
     let c = db::update_collection(&conn, &name, req.schema.as_deref())?;
     if req.list_rule.is_some()
         || req.view_rule.is_some()

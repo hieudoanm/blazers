@@ -210,6 +210,19 @@ pub fn paths() -> serde_json::Map<String, serde_json::Value> {
                     "responses": {"200": {"description": "LoginResponse with token"}, "401": {"description": "Invalid credentials or code"}}
                 }
             },
+            "/api/auth/anonymous": {
+                "post": {
+                    "summary": "Anonymous sign-in — creates a passwordless user and returns a JWT",
+                    "description": "Supabase-style anonymous auth. The user gets `data.is_anonymous = true` and a synthetic `anon-*@anonymous.local` email. Link a real email + password later via PATCH /api/auth/me.",
+                    "tags": ["Auth"],
+                    "security": [],
+                    "requestBody": {"content": {"application/json": {"schema": {"type": "object"}}}},
+                    "responses": {
+                        "200": {"description": "LoginResponse with token and anonymous user"},
+                        "401": {"description": "Invalid credentials"}
+                    }
+                }
+            },
             "/api/auth/login": {
                 "post": {
                     "summary": "Login and get JWT token",

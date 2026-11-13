@@ -15,7 +15,7 @@ async fn handle_socket_stores_received_message_in_db() {
 
     let key = crate::secrets::get_or_create_secrets_key(&tmp_dir).unwrap();
     let ws_hub = new_ws_hub();
-    let cache = Arc::new(crate::cache::CacheStore::new());
+    let cache = Arc::new(blazers_kv::cache::CacheStore::new());
     let sse_hub = crate::notification::new_sse_hub();
     let log_hub = crate::log::new_log_hub();
     let pubsub_hub = crate::pubsub::new_pubsub_hub();
@@ -87,7 +87,7 @@ async fn handle_socket_sends_message_to_client() {
 
     let key = crate::secrets::get_or_create_secrets_key(&tmp_dir).unwrap();
     let ws_hub = new_ws_hub();
-    let cache = Arc::new(crate::cache::CacheStore::new());
+    let cache = Arc::new(blazers_kv::cache::CacheStore::new());
     let sse_hub = crate::notification::new_sse_hub();
     let log_hub = crate::log::new_log_hub();
     let pubsub_hub = crate::pubsub::new_pubsub_hub();

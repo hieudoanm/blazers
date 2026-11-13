@@ -21,6 +21,7 @@ pub fn app(state: Arc<AppState>) -> Router {
         .route("/api/batch", post(handlers::handle_batch))
         .route("/api/auth/register", post(handlers::post_register))
         .route("/api/auth/login", post(handlers::post_login))
+        .route("/api/auth/anonymous", post(handlers::post_anonymous))
         .route(
             "/api/auth/me",
             get(handlers::get_me).patch(handlers::update_me),
@@ -192,6 +193,14 @@ pub fn app(state: Arc<AppState>) -> Router {
                 .delete(handlers::delete_cron_job),
         )
         .route("/api/cronjobs/{id}/run", post(handlers::run_cron_job))
+        .route(
+            "/api/functions",
+            get(handlers::list_functions).post(handlers::upsert_function),
+        )
+        .route(
+            "/api/functions/{name}",
+            delete(handlers::delete_function).post(handlers::invoke_function),
+        )
         .route("/api/cronjobs/{id}/logs", get(handlers::list_cron_job_logs))
         .route("/api/backup", get(handlers::get_backup))
         .route("/api/backup/run", post(crate::backups::handle_run_backup))

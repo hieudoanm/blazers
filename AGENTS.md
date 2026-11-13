@@ -16,6 +16,7 @@ Inspired by PocketBase and Supabase; see the feature comparison in
 | Path                        | What it is                                                                                                                                                      |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `crates/blazers-core`       | Storage layer: `db/` (schema, migrations, all SQL, split by domain) + `models/` (wire types, `AppError`, split by domain). See `crates/blazers-core/AGENTS.md`. |
+| `crates/blazers-kv`          | Key-value store: shared `CacheStore` (typed ops) + `kvproto` (Redis-style TCP for `blazers kv`). See `crates/blazers-kv/AGENTS.md`. |
 | `crates/blazers-server`     | Everything HTTP: feature modules + `app.rs` (router, embedded dashboard via `rust-embed`, `serve_http`). See `crates/blazers-server/AGENTS.md`.                 |
 | `crates/blazers-mcp`        | MCP stdio server (newline-delimited JSON-RPC 2.0) exposing the DB as tools. See `crates/blazers-mcp/AGENTS.md`.                                                 |
 | `crates/blazers`            | Thin binary: `blazers` / `blazers serve` → HTTP, `blazers mcp serve` → MCP.                                                                                     |
@@ -57,9 +58,9 @@ Data lives in `$BLAZERS_DATA` (default `~/.blazers`): `data.db`, `secrets.key`,
   when adding deps; prefer versions published >7 days ago.
 - Errors are explicit: libraries return typed errors (`models::AppError` maps to
   HTTP statuses); no silent `unwrap()` on I/O or external input.
-- `blazers-core` must not depend on `blazers-server`; `blazers-server` owns all
-  axum handlers; `blazers-mcp` may depend on both. Keep the dependency graph
-  acyclic.
+- `blazers-core` must not depend on `blazers-server`/`blazers-kv`;
+  `blazers-server` owns all axum handlers; `blazers-mcp` depends on
+  `blazers-core` only. Keep the dependency graph acyclic.
 - New HTTP features: add the module under `crates/blazers-server/src/`, declare
   it `pub mod` in `lib.rs`, register routes in `app.rs`.
 - Unit tests live in per-module `tests/` directories next to the code

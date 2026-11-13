@@ -37,6 +37,12 @@ A collection has a name and a JSON **schema**:
 | `array`   | `TEXT`        | JSON-encoded array           |
 | `object`  | `TEXT`        | JSON-encoded object          |
 
+The schema itself is validated when a collection is created or updated: the
+value must be a JSON object whose keys are field names and whose values are one
+of the types above (`?` suffix allowed). Unknown types, non-string type values,
+or a non-object schema are rejected with `400` — a malformed schema is never
+silently stored as schemaless.
+
 Append `?` to the field name to make it optional:
 
 ```json

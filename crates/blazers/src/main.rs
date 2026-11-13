@@ -98,7 +98,7 @@ async fn main() {
         return;
     }
     if let Some((bind, port)) = kv_args(&args) {
-        if let Err(err) = blazers_server::kvproto::serve_kv(&bind, port).await {
+        if let Err(err) = blazers_kv::kvproto::serve_kv(&bind, port).await {
             eprintln!("blazers kv: {err}");
             std::process::exit(1);
         }

@@ -48,7 +48,7 @@ fn test_app_state(hub: Arc<RwLock<SSEHub>>) -> Arc<AppState> {
         http_client: reqwest::Client::new(),
         secrets_key: vec![1, 2, 3, 4],
         ws_hub: crate::websocket::new_ws_hub(),
-        cache: Arc::new(crate::cache::CacheStore::new()),
+        cache: Arc::new(blazers_kv::cache::CacheStore::new()),
         sse_hub: crate::notification::new_sse_hub(),
         log_hub: crate::log::new_log_hub(),
         pubsub_hub: hub,

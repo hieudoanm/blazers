@@ -11,7 +11,7 @@ pub fn paths() -> serde_json::Map<String, serde_json::Value> {
                     "tags": ["Collections"],
                     "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {
                         "name": {"type": "string"},
-                        "schema": {"type": "string", "description": "JSON schema string"}
+                        "schema": {"type": "string", "description": "JSON object mapping field names to types (string, number, integer, boolean, array, object, email, url); suffix a name with ? for optional"}
                     }, "required": ["name"]}}}},
                     "responses": {"200": {"description": "Created collection"}, "409": {"description": "Already exists"}}
                 }
@@ -28,7 +28,7 @@ pub fn paths() -> serde_json::Map<String, serde_json::Value> {
                     "tags": ["Collections"],
                     "parameters": [{"name": "name", "in": "path", "required": true, "schema": {"type": "string"}}],
                     "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {
-                        "schema": {"type": "string", "description": "New JSON schema"}
+                        "schema": {"type": "string", "description": "New JSON schema — validated against the same field-type rules"}
                     }}}}},
                     "responses": {"200": {"description": "Updated collection"}, "404": {"description": "Not found"}}
                 },

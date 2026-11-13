@@ -13,6 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 blazers-core = { path = "../blazers-core" }
+blazers-kv = { path = "../blazers-kv" }
 blazers-server = { path = "../blazers-server" }
 blazers-mcp = { path = "../blazers-mcp" }
 tokio.workspace = true

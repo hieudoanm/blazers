@@ -4,9 +4,8 @@ HTTP + features crate for Blazers. See the root [`AGENTS.md`](../../AGENTS.md).
 
 - `src/lib.rs` declares every feature module `pub`; `src/app/` wires routes
   (`routes.rs`), embedded assets (`assets.rs`) and `serve_http` (`serve.rs`).
-  HTTP handlers live in `src/handlers/` split by domain; `src/cache/` and
-  `src/kvproto/` hold the typed-cache ops and TCP protocol commands. `kvproto.rs` is the Redis-style inline-protocol
-  TCP listener (`blazers kv`), sharing `CacheStore` with the REST cache API.
+  HTTP handlers live in `src/handlers/` split by domain; The cache store and `blazers kv` TCP listener live in the
+  `blazers-kv` crate (`blazers_kv::cache::CacheStore`, `blazers_kv::kvproto`).
 - `AppState` (in `handlers.rs`) is the shared context: db pool, storage dir,
   http client, secrets key, ws/sse/log/pubsub hubs, rate limiter.
 - `mailer.rs` (SMTP via lettre, config in `_settings`), `backups.rs`

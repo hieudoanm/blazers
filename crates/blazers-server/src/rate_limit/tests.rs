@@ -29,7 +29,7 @@ async fn make_rate_limit_app(
         http_client: reqwest::Client::new(),
         secrets_key: vec![1, 2, 3, 4],
         ws_hub: crate::websocket::new_ws_hub(),
-        cache: std::sync::Arc::new(crate::cache::CacheStore::new()),
+        cache: std::sync::Arc::new(blazers_kv::cache::CacheStore::new()),
         sse_hub: crate::notification::new_sse_hub(),
         log_hub: crate::log::new_log_hub(),
         pubsub_hub: crate::pubsub::new_pubsub_hub(),

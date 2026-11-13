@@ -47,6 +47,23 @@ pub async fn update_me(
     let user = db::get_user(&conn, &claims.user_id)?
         .ok_or_else(|| AppError::NotFound("user not found".into()))?;
 
+    let was_anonymous = user.data.get("is_anonymous").and_then(|v| v.as_bool()) == Some(true);
+    let mut became_permanent = false;
+
+    if let Some(email) = req.email.as_deref().map(str::trim) {
+        if email.is_empty() || !email.contains('@') {
+            return Err(AppError::BadRequest("valid email is required".into()));
+        }
+        if email != user.email {
+            if let Some((_, _, _, _, _)) = db::find_user_by_email(&conn, email)? {
+                return Err(AppError::Conflict("email already registered".into()));
+            }
+            db::update_user_email(&conn, &user.id, email)?;
+            // Linking a real email ends the anonymous-account phase.
+            became_permanent = was_anonymous;
+        }
+    }
+
     if let Some(new_password) = req.password.as_deref() {
         if new_password.len() < 6 {
             return Err(AppError::BadRequest(
@@ -69,8 +86,31 @@ pub async fn update_me(
         db::update_user_password(&conn, &user.id, &hash)?;
     }
 
-    if let Some(data) = req.data {
+    if let Some(mut data) = req.data {
+        // `is_anonymous` is server-managed: clients can't set it, and it is
+        // preserved (or cleared on email link) across data replacements.
+        if let Some(obj) = data.as_object_mut() {
+            let flag = if became_permanent {
+                Some(Value::Bool(false))
+            } else {
+                user.data.get("is_anonymous").cloned()
+            };
+            match flag {
+                Some(v) => {
+                    obj.insert("is_anonymous".into(), v);
+                }
+                None => {
+                    obj.remove("is_anonymous");
+                }
+            }
+        }
         db::update_user_data(&conn, &user.id, &data)?;
+    } else if became_permanent {
+        let mut data = user.data.clone();
+        if let Some(obj) = data.as_object_mut() {
+            obj.insert("is_anonymous".into(), Value::Bool(false));
+            db::update_user_data(&conn, &user.id, &data)?;
+        }
     }
 
     let updated = db::get_user(&conn, &user.id)?

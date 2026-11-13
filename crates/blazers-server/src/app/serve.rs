@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::app::app;
 use crate::app::assets::get_local_ip;
 use crate::handlers::AppState;
-use crate::{cache, cronjobs, notification, pubsub, rate_limit, secrets, websocket};
+use crate::{cronjobs, notification, pubsub, rate_limit, secrets, websocket};
 use blazers_core::db;
 
 pub async fn serve_http() {
@@ -23,12 +23,12 @@ pub async fn serve_http() {
     let key = secrets::get_or_create_secrets_key(&db::data_dir()).expect("secrets key");
     let ws_hub = websocket::new_ws_hub();
     tokio::spawn(websocket::ws_hub_run(ws_hub.clone()));
-    let cache_arc = std::sync::Arc::new(cache::CacheStore::new());
+    let cache_arc = std::sync::Arc::new(blazers_kv::cache::CacheStore::new());
     {
         let conn = pool.get().await.expect("get db for cache init");
         cache_arc.load_from_db(&conn);
     }
-    cache::start_eviction_loop(cache_arc.clone());
+    blazers_kv::cache::start_eviction_loop(cache_arc.clone());
     let sse_hub = notification::new_sse_hub();
     let log_hub = crate::log::new_log_hub();
     let pubsub_hub = pubsub::new_pubsub_hub();

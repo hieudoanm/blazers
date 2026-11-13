@@ -46,6 +46,16 @@ Create a user. Does **not** return a token — log in afterwards.
 **Errors**: `400` missing fields, `401` bad credentials, `409`-style duplicate
 email on register.
 
+## `POST /api/auth/anonymous`
+
+Passwordless sign-in (guest accounts). No body required.
+
+**Response `200`** — `LoginResponse` with `token`; `user.data.is_anonymous` is
+`true` and `user.email` is a synthetic `anon-*@anonymous.local` address.
+
+Link the account to a real identity afterwards via
+[`PATCH /api/auth/me`](#patch-apiauthme) with `email` + `password`.
+
 ## Authenticated user endpoints (token required)
 
 ### `GET /api/auth/me`

@@ -29,7 +29,10 @@ Create a collection.
 ```
 
 `schema` may be a JSON **string** or object (serialized to string by the
-handler). Omit for schemaless.
+handler). Omit for schemaless. The schema is validated: it must be a JSON object
+mapping field names to known types (`string`, `number`, `integer`, `boolean`,
+`array`, `object`, `email`, `url`, optional `?` suffix) — anything else returns
+`400`.
 
 **Response `201`** — the created `Collection`.
 

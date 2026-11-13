@@ -57,6 +57,12 @@ pub fn migrate_db(conn: &Connection) -> Result<()> {
             status          TEXT NOT NULL DEFAULT '',
             created_at      TEXT NOT NULL DEFAULT (datetime('now'))
         );
+        CREATE TABLE IF NOT EXISTS _functions (
+            name       TEXT PRIMARY KEY,
+            code       TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
         CREATE TABLE IF NOT EXISTS _secrets (
             id           TEXT PRIMARY KEY,
             name         TEXT NOT NULL,

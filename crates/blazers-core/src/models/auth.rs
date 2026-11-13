@@ -57,6 +57,8 @@ pub struct UserRecord {
 #[derive(Debug, Deserialize)]
 pub struct UpdateUserRequest {
     #[serde(default)]
+    pub email: Option<String>,
+    #[serde(default)]
     pub data: Option<serde_json::Value>,
     #[serde(default)]
     pub password: Option<String>,

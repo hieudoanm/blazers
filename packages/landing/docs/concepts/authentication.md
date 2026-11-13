@@ -43,6 +43,17 @@ Content-Type: application/json
 Returns `{ "user": {...}, "token": "eyJ..." }` — the only endpoint that issues
 tokens.
 
+## Anonymous sign-in
+
+`POST /api/auth/anonymous` creates a passwordless user and returns a normal
+`LoginResponse` (`{ user, token }`). The account is marked with
+`data.is_anonymous = true` and gets a synthetic `anon-*@anonymous.local` email.
+
+Use it for guest/try-before-signup flows. To convert the account later, call
+`PATCH /api/auth/me` with a real `email` and `password` — the flag flips to
+`false` automatically and the account can then log in with email + password.
+`is_anonymous` is server-managed: clients cannot set it through `data`.
+
 ## Using the token
 
 Send the token on every protected request:

@@ -1,6 +1,6 @@
 use super::*;
 use crate::handlers::AppState;
-use crate::{cache, notification, pubsub, rate_limit, secrets, websocket};
+use crate::{notification, pubsub, rate_limit, secrets, websocket};
 use axum::Router;
 use axum::{
     body::Body,
@@ -28,7 +28,7 @@ async fn test_app_with_state() -> (Router, Arc<AppState>) {
     drop(conn);
     let key = secrets::get_or_create_secrets_key(&tmp_dir).unwrap();
     let ws_hub = websocket::new_ws_hub();
-    let cache = std::sync::Arc::new(cache::CacheStore::new());
+    let cache = std::sync::Arc::new(blazers_kv::cache::CacheStore::new());
     let sse_hub = notification::new_sse_hub();
     let log_hub = crate::log::new_log_hub();
     let pubsub_hub = pubsub::new_pubsub_hub();

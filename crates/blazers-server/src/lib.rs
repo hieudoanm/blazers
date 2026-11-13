@@ -11,13 +11,12 @@
 pub mod app;
 pub mod auth;
 pub mod backups;
-pub mod cache;
 pub mod content_type;
 pub mod cronjobs;
 pub mod handlers;
 pub mod image;
 pub mod import_export;
-pub mod kvproto;
+pub mod js;
 pub mod log;
 pub mod mailer;
 pub mod notification;
@@ -28,3 +27,7 @@ pub mod rbac;
 pub mod secrets;
 pub mod webhook;
 pub mod websocket;
+
+// The cache store and `blazers kv` protocol live in `blazers-kv`; re-exported
+// here so `blazers_server::cache` / `blazers_server::kvproto` paths keep working.
+pub use blazers_kv::{cache, kvproto};

@@ -195,6 +195,7 @@ mod auth_mfa;
 mod batch;
 mod cache;
 mod collections;
+mod edge;
 mod features;
 mod hooks;
 mod misc;

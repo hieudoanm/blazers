@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { DOC_SECTIONS, getDocPages, type DocPage } from '@/lib/docs';
+import DocsSearch from '@/components/molecules/DocsSearch';
 import type { JSX } from 'react';
 
 export const generateStaticParams = () =>
@@ -32,10 +33,17 @@ const DocsPage = async ({ params }: DocsPageProps): Promise<JSX.Element> => {
   const doc = findDoc(slug);
   if (!doc) notFound();
   const overview = pages.find((p) => p.slug === '');
+  const currentIndex = pages.findIndex((p) => p.slug === doc.slug);
+  const previous = currentIndex > 0 ? pages[currentIndex - 1] : undefined;
+  const next =
+    currentIndex >= 0 && currentIndex < pages.length - 1
+      ? pages[currentIndex + 1]
+      : undefined;
 
   return (
     <>
       <div className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-6xl flex-col px-5 py-10">
+        <DocsSearch />
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-10 md:grid-cols-[16rem_1fr]">
           <aside className="hidden min-h-0 overflow-y-auto md:block">
             <Link
@@ -98,6 +106,36 @@ const DocsPage = async ({ params }: DocsPageProps): Promise<JSX.Element> => {
                 dangerouslySetInnerHTML={{ __html: doc.html }}
               />
             </div>
+            <nav className="border-base-content/10 mt-12 flex items-center justify-between gap-4 border-t pt-6">
+              <div className="flex-1">
+                {previous && (
+                  <Link
+                    href={previous.slug ? `/docs/${previous.slug}/` : '/docs/'}
+                    className="border-base-content/10 group flex items-center gap-2 rounded-lg border px-4 py-2 text-sm">
+                    <span aria-hidden="true">←</span>
+                    <span className="flex flex-col">
+                      <span className="text-base-content/50 text-xs">
+                        Previous
+                      </span>
+                      <span className="font-medium">{previous.title}</span>
+                    </span>
+                  </Link>
+                )}
+              </div>
+              <div className="flex-1 text-right">
+                {next && (
+                  <Link
+                    href={next.slug ? `/docs/${next.slug}/` : '/docs/'}
+                    className="border-base-content/10 group ml-auto flex items-center justify-end gap-2 rounded-lg border px-4 py-2 text-sm">
+                    <span className="flex flex-col items-end">
+                      <span className="text-base-content/50 text-xs">Next</span>
+                      <span className="font-medium">{next.title}</span>
+                    </span>
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                )}
+              </div>
+            </nav>
           </article>
         </div>
       </div>

@@ -52,7 +52,9 @@ pub use files_access::*;
 pub mod files_upload;
 pub use files_upload::*;
 pub mod files;
+pub mod functions;
 pub use files::*;
+pub use functions::*;
 pub mod webhooks;
 pub use webhooks::*;
 pub mod secrets_admin;
@@ -109,7 +111,7 @@ pub struct AppState {
     pub http_client: reqwest::Client,
     pub secrets_key: Vec<u8>,
     pub ws_hub: std::sync::Arc<tokio::sync::RwLock<websocket::WSHub>>,
-    pub cache: std::sync::Arc<crate::cache::CacheStore>,
+    pub cache: std::sync::Arc<blazers_kv::cache::CacheStore>,
     pub sse_hub: std::sync::Arc<tokio::sync::RwLock<crate::notification::SSEHub>>,
     pub log_hub: std::sync::Arc<tokio::sync::RwLock<crate::log::SSEHub>>,
     pub pubsub_hub: std::sync::Arc<tokio::sync::RwLock<crate::pubsub::SSEHub>>,
@@ -223,6 +225,31 @@ pub async fn post_login(
         "user": auth::user_response(&user),
         "token": token,
     })))
+}
+
+/// POST /api/auth/anonymous — passwordless sign-in (Supabase anonymous
+/// parity). Creates a user with a synthetic unique email, no password, and
+/// `data.is_anonymous = true`, then returns a LoginResponse. The account can
+/// later be linked to a real email + password via PATCH /api/auth/me.
+pub async fn post_anonymous(
+    State(state): State<std::sync::Arc<AppState>>,
+) -> std::result::Result<Json<LoginResponse>, AppError> {
+    let conn = state
+        .db
+        .get()
+        .await
+        .map_err(|e| AppError::Internal(e.to_string()))?;
+    let id = Uuid::new_v4().to_string().replace('-', "");
+    let email = format!("anon-{}@anonymous.local", Uuid::new_v4().simple());
+    db::insert_user_no_password(&conn, &id, &email)?;
+    db::update_user_data(&conn, &id, &serde_json::json!({ "is_anonymous": true }))?;
+    let user = db::get_user(&conn, &id)?
+        .ok_or_else(|| AppError::Internal("anonymous user not found".into()))?;
+    let token = auth::issue_token(&user.id, &user.email)?;
+    Ok(Json(LoginResponse {
+        user: auth::user_response(&user),
+        token,
+    }))
 }
 
 /// POST /api/auth/refresh — sliding-session renewal: a valid Bearer token

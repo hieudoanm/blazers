@@ -55,6 +55,36 @@ pub(super) fn validate_field(value: &Value, type_str: &str, field_name: &str) ->
     }
 }
 
+const SCHEMA_TYPES: &[&str] = &[
+    "string", "number", "integer", "boolean", "array", "object", "email", "url",
+];
+
+/// Validates a collection `schema` string: must be a JSON object mapping
+/// field names (optionally suffixed with `?` for optional) to a known type.
+pub fn validate_schema(schema: &str) -> Result<()> {
+    if schema.is_empty() || schema == "{}" {
+        return Ok(());
+    }
+    let map: serde_json::Map<String, Value> = serde_json::from_str(schema)
+        .map_err(|e| AppError::BadRequest(format!("invalid schema JSON: {e}")))?;
+    for (field, type_val) in &map {
+        let base = field.strip_suffix('?').unwrap_or(field);
+        if base.is_empty() {
+            return Err(AppError::BadRequest("schema field name is empty".into()));
+        }
+        let ty = type_val.as_str().ok_or_else(|| {
+            AppError::BadRequest(format!("schema field '{field}' must map to a type string"))
+        })?;
+        if !SCHEMA_TYPES.contains(&ty) {
+            return Err(AppError::BadRequest(format!(
+                "schema field '{field}' has unknown type '{ty}' (expected one of: {})",
+                SCHEMA_TYPES.join(", ")
+            )));
+        }
+    }
+    Ok(())
+}
+
 pub fn validate_data(data: &Value, schema: &str) -> Result<()> {
     if schema.is_empty() || schema == "{}" {
         return Ok(());

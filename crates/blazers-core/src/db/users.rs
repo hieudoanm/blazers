@@ -88,6 +88,23 @@ pub fn update_user_data(conn: &Connection, id: &str, data: &Value) -> Result<()>
     Ok(())
 }
 
+/// Changes a user's email (anonymous-account linking). Returns Conflict when
+/// another user already owns the address.
+pub fn update_user_email(conn: &Connection, id: &str, email: &str) -> Result<()> {
+    conn.execute(
+        "UPDATE _users SET email = ?1, updated_at = ?2 WHERE id = ?3",
+        params![email, Utc::now().to_rfc3339(), id],
+    )
+    .map_err(|e| {
+        if e.to_string().contains("UNIQUE") {
+            AppError::Conflict("email already registered".into())
+        } else {
+            AppError::Internal(format!("update email: {e}"))
+        }
+    })?;
+    Ok(())
+}
+
 pub fn update_user_password(conn: &Connection, id: &str, hash: &str) -> Result<()> {
     conn.execute(
         "UPDATE _users SET password = ?1, updated_at = ?2 WHERE id = ?3",
