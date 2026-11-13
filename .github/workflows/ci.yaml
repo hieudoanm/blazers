@@ -219,7 +219,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build (and push on master) Docker image
-        uses: docker/build-push-action@v6.19.2
+        uses: docker/build-push-action@v7.4.0
         with:
           context: .
           push: ${{ github.ref == 'refs/heads/master' }}
