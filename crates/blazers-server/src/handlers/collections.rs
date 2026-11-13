@@ -10,7 +10,12 @@ pub async fn list_collections(
         .get()
         .await
         .map_err(|e| AppError::Internal(e.to_string()))?;
-    let cols = db::list_collections(&conn)?;
+    let mut cols = db::list_collections(&conn)?;
+    // The managed `users` auth collection is synthetic — backed by `_users`,
+    // not a dynamic table.
+    if !cols.iter().any(|c| c.name == "users") {
+        cols.insert(0, users_collection());
+    }
     Ok(Json(cols))
 }
 
@@ -52,6 +57,9 @@ pub async fn get_collection(
         .get()
         .await
         .map_err(|e| AppError::Internal(e.to_string()))?;
+    if name == "users" {
+        return Ok(Json(users_collection()));
+    }
     let c =
         db::get_collection(&conn, &name)?.ok_or_else(|| AppError::NotFound("not found".into()))?;
     Ok(Json(c))
@@ -97,5 +105,53 @@ pub async fn update_collection(
         .map_err(|e| AppError::Internal(e.to_string()))?;
     rbac::require_role(&conn, &claims.user_id, &name, "admin")?;
     let c = db::update_collection(&conn, &name, req.schema.as_deref())?;
+    if req.list_rule.is_some()
+        || req.view_rule.is_some()
+        || req.create_rule.is_some()
+        || req.update_rule.is_some()
+        || req.delete_rule.is_some()
+    {
+        // Merge provided rules over the current values.
+        let mut rules = CollectionRules {
+            list_rule: c.list_rule.clone(),
+            view_rule: c.view_rule.clone(),
+            create_rule: c.create_rule.clone(),
+            update_rule: c.update_rule.clone(),
+            delete_rule: c.delete_rule.clone(),
+        };
+        if let Some(v) = req.list_rule {
+            rules.list_rule = v;
+        }
+        if let Some(v) = req.view_rule {
+            rules.view_rule = v;
+        }
+        if let Some(v) = req.create_rule {
+            rules.create_rule = v;
+        }
+        if let Some(v) = req.update_rule {
+            rules.update_rule = v;
+        }
+        if let Some(v) = req.delete_rule {
+            rules.delete_rule = v;
+        }
+        db::update_collection_rules(&conn, &name, &rules)?;
+        return Ok(Json(db::get_collection(&conn, &name)?.unwrap_or(c)));
+    }
     Ok(Json(c))
+}
+
+/// Synthetic collection descriptor for the managed auth `users` collection.
+fn users_collection() -> Collection {
+    Collection {
+        name: "users".into(),
+        schema: "{}".into(),
+        list_rule: String::new(),
+        view_rule: String::new(),
+        create_rule: String::new(),
+        update_rule: String::new(),
+        delete_rule: String::new(),
+        r#type: "auth".into(),
+        created_at: String::new(),
+        updated_at: String::new(),
+    }
 }

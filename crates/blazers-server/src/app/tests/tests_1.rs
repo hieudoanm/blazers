@@ -42,7 +42,12 @@ async fn test_collection_crud() {
     let (status, value) = get_json(&app, "/api/collections", Some(&token)).await;
     assert_eq!(status, StatusCode::OK);
     let cols = value.as_array().unwrap();
-    assert_eq!(cols.len(), 1);
+    // one data collection + the synthetic `users` auth collection
+    assert_eq!(cols.len(), 2);
+    assert!(
+        cols.iter()
+            .any(|c| c["name"] == "users" && c["type"] == "auth")
+    );
 
     let (status, value) = request(&app, "GET", "/api/collections/posts", Some(&token), None).await;
     assert_eq!(status, StatusCode::OK);

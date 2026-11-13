@@ -26,8 +26,31 @@ pub mod collections;
 pub use collections::*;
 pub mod records;
 pub use records::*;
+pub mod records_item;
+pub use records_item::*;
 pub mod buckets;
 pub use buckets::*;
+pub mod auth_users;
+pub use auth_users::*;
+pub mod auth_otp;
+pub use auth_otp::*;
+pub mod admin_users;
+pub use admin_users::*;
+pub mod oauth;
+pub use oauth::*;
+pub mod mfa;
+pub(crate) mod oauth_config;
+pub use mfa::*;
+pub mod settings;
+pub use settings::*;
+pub mod batch;
+pub use batch::*;
+pub mod expand;
+pub use expand::*;
+pub mod files_access;
+pub use files_access::*;
+pub mod files_upload;
+pub use files_upload::*;
 pub mod files;
 pub use files::*;
 pub mod webhooks;
@@ -176,7 +199,7 @@ pub async fn post_register(
 pub async fn post_login(
     State(state): State<std::sync::Arc<AppState>>,
     Json(req): Json<LoginRequest>,
-) -> std::result::Result<Json<LoginResponse>, AppError> {
+) -> std::result::Result<Json<Value>, AppError> {
     if req.email.is_empty() || req.password.is_empty() {
         return Err(AppError::BadRequest(
             "email and password are required".into(),
@@ -187,8 +210,40 @@ pub async fn post_login(
         .get()
         .await
         .map_err(|e| AppError::Internal(e.to_string()))?;
-    let resp = auth::login_user(&conn, &req.email, &req.password)?;
-    Ok(Json(resp))
+    let user = auth::verify_credentials(&conn, &req.email, &req.password)?;
+    if user.mfa_enabled {
+        // Password OK but MFA enrolled — client must call /api/auth/mfa/login.
+        return Ok(Json(serde_json::json!({
+            "mfa_required": true,
+            "user": auth::user_response(&user),
+        })));
+    }
+    let token = auth::issue_token(&user.id, &user.email)?;
+    Ok(Json(serde_json::json!({
+        "user": auth::user_response(&user),
+        "token": token,
+    })))
+}
+
+/// POST /api/auth/refresh — sliding-session renewal: a valid Bearer token
+/// is exchanged for a fresh 72h JWT (PocketBase `auth-refresh` parity).
+pub async fn refresh_token(
+    headers: HeaderMap,
+    State(state): State<std::sync::Arc<AppState>>,
+) -> std::result::Result<Json<LoginResponse>, AppError> {
+    let claims = extract_claims(&headers)?;
+    let conn = state
+        .db
+        .get()
+        .await
+        .map_err(|e| AppError::Internal(e.to_string()))?;
+    let user = db::get_user(&conn, &claims.user_id)?
+        .ok_or_else(|| AppError::NotFound("user not found".into()))?;
+    let token = auth::issue_token(&user.id, &user.email)?;
+    Ok(Json(LoginResponse {
+        user: auth::user_response(&user),
+        token,
+    }))
 }
 
 #[cfg(test)]

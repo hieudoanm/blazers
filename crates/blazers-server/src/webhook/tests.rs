@@ -88,6 +88,12 @@ fn test_webhook_collection_data() {
     let collection = Collection {
         name: "posts".to_string(),
         schema: "{\"title\":\"string\"}".to_string(),
+        list_rule: String::new(),
+        view_rule: String::new(),
+        create_rule: String::new(),
+        update_rule: String::new(),
+        delete_rule: String::new(),
+        r#type: "records".to_string(),
         created_at: "2024-01-01T00:00:00Z".to_string(),
         updated_at: "2024-01-02T00:00:00Z".to_string(),
     };

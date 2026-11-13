@@ -85,6 +85,16 @@ impl Svr {
             .unwrap()
     }
 
+    async fn put_auth(&self, p: &str, token: &str, body: Value) -> reqwest::Response {
+        self.cli
+            .put(self.url(p))
+            .header("Authorization", format!("Bearer {token}"))
+            .json(&body)
+            .send()
+            .await
+            .unwrap()
+    }
+
     async fn patch_auth(&self, p: &str, token: &str, body: Value) -> reqwest::Response {
         self.cli
             .patch(self.url(p))
@@ -180,7 +190,13 @@ impl Drop for Svr {
 }
 
 mod auth;
+mod auth_flows;
+mod auth_mfa;
+mod batch;
 mod cache;
 mod collections;
+mod features;
+mod hooks;
 mod misc;
 mod storage;
+mod users;

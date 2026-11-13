@@ -10,6 +10,7 @@
 
 pub mod app;
 pub mod auth;
+pub mod backups;
 pub mod cache;
 pub mod content_type;
 pub mod cronjobs;
@@ -18,6 +19,7 @@ pub mod image;
 pub mod import_export;
 pub mod kvproto;
 pub mod log;
+pub mod mailer;
 pub mod notification;
 pub mod openapi;
 pub mod pubsub;

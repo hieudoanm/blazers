@@ -13,8 +13,11 @@ pub fn paths() -> serde_json::Map<String, serde_json::Value> {
                 "post": {"summary": "Upload file", "tags": ["Files"], "parameters": [{"name": "name", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"required": true, "content": {"multipart/form-data": {"schema": {"type": "object", "properties": {"file": {"type": "string", "format": "binary"}}}}}}, "responses": {"200": {"description": "Uploaded file metadata"}}}
             },
             "/api/buckets/{name}/files/{id}": {
-                "get": {"summary": "Download file", "tags": ["Files"], "parameters": [{"name": "name", "in": "path", "required": true, "schema": {"type": "string"}}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "File binary content"}, "404": {"description": "Not found"}}},
+                "get": {"summary": "Download file (public buckets and ?token= file tokens allowed without auth)", "tags": ["Files"], "parameters": [{"name": "name", "in": "path", "required": true, "schema": {"type": "string"}}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}, {"name": "token", "in": "query", "schema": {"type": "string"}, "description": "File access token"}], "responses": {"200": {"description": "File binary content"}, "401": {"description": "Auth required"}, "404": {"description": "Not found"}}},
                 "delete": {"summary": "Delete file", "tags": ["Files"], "parameters": [{"name": "name", "in": "path", "required": true, "schema": {"type": "string"}}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}}
+            },
+            "/api/buckets/{name}/files/{id}/token": {
+                "post": {"summary": "Issue a 1h download token for a protected file; optional {collection, record} body binds issuance to that record's view_rule", "tags": ["Files"], "parameters": [{"name": "name", "in": "path", "required": true, "schema": {"type": "string"}}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"collection": {"type": "string"}, "record": {"type": "string"}}}}}}, "responses": {"200": {"description": "{token, expires_in}"}, "401": {"description": "Unauthorized"}, "403": {"description": "Record view_rule denied"}}}
             }
     }).as_object().unwrap().clone()
 }

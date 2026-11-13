@@ -25,19 +25,20 @@ Inspired by [PocketBase](https://pocketbase.io/) and
 
 | Feature | Endpoint prefix | What it does |
 | ------- | --------------- | ------------ |
-| Auth | `/api/auth/*` | Register, login, JWT bearer tokens (bcrypt passwords) |
-| Collections & records | `/api/collections/*` | Schema-less collections stored as dynamic SQLite tables; full CRUD, paging, search, sorting, filtering |
-| RBAC | `/api/permissions` | Per-user/collection/role access rules enforced on every request |
-| Buckets & files | `/api/buckets/*` | Upload/download/delete files, public vs private buckets, image thumbnails |
-| Realtime | `/ws`, `/api/*/stream` | WebSocket hub plus SSE streams for notifications, logs and pub/sub |
+| Auth | `/api/auth/*` | Register, login, JWT bearer tokens (bcrypt), `/me` profile + custom fields, password reset, email verification, OTP sign-in and OAuth2 (Google/GitHub/GitLab/Discord), TOTP MFA and token refresh via SMTP; managed `users` collection (`/api/auth/users*`) with rule expressions and impersonation |
+| Collections & records | `/api/collections/*` | Schema-less collections stored as dynamic SQLite tables; full CRUD, paging, search, sorting, filtering, `?filter=`/`?sort=`/`?expand=` |
+| Batch | `/api/batch` | Run up to 50 API calls in one round-trip, per-request results/errors |
+| RBAC | `/api/permissions` | Per-user/collection/role access rules **plus** per-collection record rules (`list/view/create/update/delete`) with `@request.auth` expressions |
+| Buckets & files | `/api/buckets/*` | Upload/download/delete files, public buckets, protected-file tokens, image thumbnails |
+| Realtime | `/ws`, `/api/*/stream` | WebSocket hub with collection subscriptions + automatic record events (`oldRecord` on update/delete); SSE streams for notifications, logs and pub/sub |
 | Pub/Sub | `/api/pubsub/*` | Topics, messages, live fan-out over SSE |
-| Webhooks | `/api/webhooks` | CRUD plus delivery logs; fired on record events |
+| Webhooks | `/api/webhooks` | CRUD plus delivery logs; fired on record events incl. synchronous `record.before_*` hooks that can patch or cancel writes |
 | Cron jobs | `/api/cronjobs` | Scheduled HTTP jobs with run logs |
 | Secrets | `/api/secrets` | AES-256-GCM encrypted key/value store |
 | Cache | `/api/cache`, `blazers kv` | Redis-style KV — strings, lists, hashes, atomic INCR/APPEND, TTL — over REST **and** a Redis-compatible TCP protocol, persisted to SQLite |
 | Notifications & logs | `/api/notifications`, `/api/logs` | SSE-streamed notification feed and request/job logs |
 | Import / Export | `/api/export`, `/api/import` | Full database snapshot as JSON |
-| Backup | `/api/backup` | Download a copy of `data.db` |
+| Backup | `/api/backup` | Download a copy of `data.db`; `backup_schedule` cron setting writes rotating snapshots |
 | Admin dashboard | `/` | Embedded HTMX admin UI — no build step, served by the binary |
 | OpenAPI | `/api/openapi.json`, `/api/docs` | Swagger UI + spec generated at runtime |
 | MCP server | `blazers mcp serve` | Expose collections/records as MCP tools over stdio; `--kv` proxies a remote KV listener |
@@ -134,17 +135,18 @@ make all                     # fmt-check + clippy + test + build
 | ---------- | ------- |
 | Single Go binary, single SQLite file (`pb_data/`) | Single Rust binary, single SQLite file (`~/.blazers/data.db`) |
 | Collections & records with JSON field types | Collections & records; schema stored as JSON, rows in dynamic tables |
-| `users` auth collection, JWT, `RequestInfo` rules | `_users` table, JWT, per-collection `_permissions` rules (public/auth/admin) |
-| File storage buckets + filesystem blobs | `_buckets`/`_files` + `uploads/` dir, thumbnails via `image` crate |
-| Realtime subscriptions (SSE/WebSocket) | `/ws` hub + SSE streams for notifications, logs, pub/sub topics |
-| Hooks (`onRecordAfterCreateSuccess`, …) | Webhooks CRUD with event fan-out and delivery logs |
+| `users` auth collection, JWT, record rules | `_users` table (custom `data` fields, `verified`) exposed as a managed auth collection (`/api/auth/users*`, `type: "auth"`, rule expressions); JWT; per-collection `_permissions` + five rule expressions with `@request.auth` |
+| File storage buckets + filesystem blobs | `_buckets`/`_files` + `uploads/` dir, thumbnails via `image` crate, public flag + protected-file tokens |
+| Realtime subscriptions (SSE/WebSocket) | `/ws` hub with collection subscriptions + automatic record events (`oldRecord` on update/delete); SSE streams for notifications, logs, pub/sub |
+| Batch requests (`?batch=1`) | `POST /api/batch` — up to 50 sub-requests per round-trip |
+| Hooks (`onRecordBefore*Request`, …) | `record.before_*` webhooks run synchronously and can patch/cancel record writes (JSVM-lite) |
 | Cron jobs (add via code) | `/api/cronjobs` CRUD + scheduler, no code required |
 | `pb_public` / `superuser` concept | `public` / `user` / `admin` permission roles |
 | Admin UI (prebuilt SPA) | Embedded HTMX dashboard served at `/` |
 | Go SDK / JS SDK | REST + OpenAPI (`/api/docs`); MCP tools for AI agents |
-| Settings via `settings` collection | Env vars (`PORT`, `BLAZERS_DATA`, `JWT_SECRET`, `BLAZERS_SECRETS_KEY`) |
-| Email/OTP, OAuth2, MFA | Not yet — JWT auth only (roadmap) |
-| Backups via `cp -r pb_data` | `GET /api/backup` downloads `data.db` |
+| Settings via `settings` collection | Env vars + `/api/settings` (SMTP, `app_url`, backup schedule — secrets encrypted) |
+| Email/OTP, OAuth2, MFA | Password reset + email verification + OTP + TOTP MFA + OAuth2 (Google/GitHub/GitLab/Discord) + token refresh |
+| Backups via `cp -r pb_data` | `GET /api/backup` + scheduled snapshots via `backup_schedule` setting |
 
 Extra vs PocketBase: Redis-style cache (REST + TCP KV protocol), pub/sub topics, notification and
 request-log feeds, encrypted secrets vault, import/export JSON snapshots,

@@ -28,10 +28,13 @@ async fn send_to_client_success_returns_true() {
     let (tx, mut rx) = mpsc::unbounded_channel();
     let id = Uuid::new_v4().to_string();
 
-    hub.write()
-        .await
-        .clients
-        .insert(id.clone(), WSConsumer { sender: tx });
+    hub.write().await.clients.insert(
+        id.clone(),
+        WSConsumer {
+            sender: tx,
+            subs: std::sync::Mutex::new(std::collections::HashMap::new()),
+        },
+    );
 
     let msg = Message::Text("hello from test".into());
     let result = send_to_client(&hub, &id, msg.clone()).await;
@@ -46,10 +49,13 @@ async fn send_to_client_channel_closed_returns_false() {
     drop(rx);
     let id = Uuid::new_v4().to_string();
 
-    hub.write()
-        .await
-        .clients
-        .insert(id.clone(), WSConsumer { sender: tx });
+    hub.write().await.clients.insert(
+        id.clone(),
+        WSConsumer {
+            sender: tx,
+            subs: std::sync::Mutex::new(std::collections::HashMap::new()),
+        },
+    );
 
     let result = send_to_client(&hub, &id, Message::Text("hello".into())).await;
     assert!(!result);
@@ -68,10 +74,13 @@ async fn close_client_success_returns_true() {
     let (tx, _rx) = mpsc::unbounded_channel();
     let id = Uuid::new_v4().to_string();
 
-    hub.write()
-        .await
-        .clients
-        .insert(id.clone(), WSConsumer { sender: tx });
+    hub.write().await.clients.insert(
+        id.clone(),
+        WSConsumer {
+            sender: tx,
+            subs: std::sync::Mutex::new(std::collections::HashMap::new()),
+        },
+    );
 
     let result = close_client(&hub, &id).await;
     assert!(result);
@@ -194,4 +203,102 @@ async fn handle_socket_connects_and_stores_in_db() {
     );
 
     std::fs::remove_dir_all(&tmp_dir).ok();
+}
+
+#[tokio::test]
+async fn broadcast_to_collection_only_reaches_subscribers() {
+    let hub = new_ws_hub();
+    let (tx_sub, mut rx_sub) = mpsc::unbounded_channel();
+    let (tx_other, mut rx_other) = mpsc::unbounded_channel();
+    let (tx_all, mut rx_all) = mpsc::unbounded_channel();
+
+    let mut subs_sub = std::collections::HashMap::new();
+    subs_sub.insert("posts".to_string(), None);
+    let mut subs_all = std::collections::HashMap::new();
+    subs_all.insert(SUB_ALL.to_string(), None);
+
+    hub.write().await.clients.insert(
+        "sub".into(),
+        WSConsumer {
+            sender: tx_sub,
+            subs: std::sync::Mutex::new(subs_sub),
+        },
+    );
+    hub.write().await.clients.insert(
+        "other".into(),
+        WSConsumer {
+            sender: tx_other,
+            subs: std::sync::Mutex::new(std::collections::HashMap::new()),
+        },
+    );
+    hub.write().await.clients.insert(
+        "all".into(),
+        WSConsumer {
+            sender: tx_all,
+            subs: std::sync::Mutex::new(subs_all),
+        },
+    );
+
+    let payload = serde_json::json!({"type": "record", "action": "create", "collection": "posts"});
+    let sent = broadcast_to_collection(&hub, "posts", &payload).await;
+    assert_eq!(sent, 2);
+    assert!(rx_sub.recv().await.is_some());
+    assert!(rx_all.recv().await.is_some());
+    assert!(rx_other.try_recv().is_err());
+
+    // different collection reaches only the wildcard subscriber
+    let sent = broadcast_to_collection(&hub, "comments", &payload).await;
+    assert_eq!(sent, 1);
+    assert!(rx_all.recv().await.is_some());
+}
+
+#[tokio::test]
+async fn broadcast_record_wraps_payload() {
+    let hub = new_ws_hub();
+    let (tx, mut rx) = mpsc::unbounded_channel();
+    let mut subs = std::collections::HashMap::new();
+    subs.insert("posts".to_string(), None);
+    hub.write().await.clients.insert(
+        "c".into(),
+        WSConsumer {
+            sender: tx,
+            subs: std::sync::Mutex::new(subs),
+        },
+    );
+    let rec = serde_json::json!({"id": "r1"});
+    broadcast_record(&hub, "posts", "update", &rec).await;
+    let msg = rx.recv().await.unwrap();
+    let Message::Text(text) = msg else {
+        panic!("expected text")
+    };
+    let v: serde_json::Value = serde_json::from_str(&text).unwrap();
+    assert_eq!(v["type"], "record");
+    assert_eq!(v["action"], "update");
+    assert_eq!(v["collection"], "posts");
+    assert_eq!(v["record"]["id"], "r1");
+}
+
+#[tokio::test]
+async fn broadcast_record_change_includes_old_record() {
+    let hub = new_ws_hub();
+    let (tx, mut rx) = mpsc::unbounded_channel();
+    let mut subs = std::collections::HashMap::new();
+    subs.insert("posts".to_string(), None);
+    hub.write().await.clients.insert(
+        "c".into(),
+        WSConsumer {
+            sender: tx,
+            subs: std::sync::Mutex::new(subs),
+        },
+    );
+    let rec = serde_json::json!({"id": "r1", "data": {"v": 2}});
+    let old = serde_json::json!({"id": "r1", "data": {"v": 1}});
+    broadcast_record_change(&hub, "posts", "update", &rec, Some(&old)).await;
+    let msg = rx.recv().await.unwrap();
+    let Message::Text(text) = msg else {
+        panic!("expected text")
+    };
+    let v: serde_json::Value = serde_json::from_str(&text).unwrap();
+    assert_eq!(v["oldRecord"]["data"]["v"], 1);
+    assert_eq!(v["record"]["data"]["v"], 2);
 }

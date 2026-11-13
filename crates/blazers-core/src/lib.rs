@@ -6,4 +6,5 @@
 //! cache entries, pub/sub topics and websocket messages.
 
 pub mod db;
+pub mod filter;
 pub mod models;

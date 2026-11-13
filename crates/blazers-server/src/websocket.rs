@@ -1,28 +1,39 @@
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use axum::extract::State;
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::http::HeaderMap;
 use axum::response::IntoResponse;
+use serde_json::Value;
 use tokio::sync::{RwLock, mpsc};
 use uuid::Uuid;
 
 use crate::handlers::AppState;
 use blazers_core::db;
 
+/// All-collections wildcard subscription topic.
+pub const SUB_ALL: &str = "*";
+
+/// collection name → optional filter expression (`None` = receive all).
+pub type Subs = Mutex<HashMap<String, Option<String>>>;
+
 pub struct WSConsumer {
     pub sender: mpsc::UnboundedSender<Message>,
+    pub subs: Subs,
 }
 
 pub struct WSHub {
     pub clients: HashMap<String, WSConsumer>,
+    /// presence channel → client id → arbitrary state JSON.
+    pub presence: HashMap<String, HashMap<String, Value>>,
 }
 
 pub fn new_ws_hub() -> Arc<RwLock<WSHub>> {
     Arc::new(RwLock::new(WSHub {
         clients: HashMap::new(),
+        presence: HashMap::new(),
     }))
 }
 
@@ -53,7 +64,10 @@ async fn handle_socket(mut socket: WebSocket, state: Arc<AppState>, user_agent: 
 
     let (msg_sender, mut msg_receiver) = mpsc::unbounded_channel::<Message>();
 
-    let consumer = WSConsumer { sender: msg_sender };
+    let consumer = WSConsumer {
+        sender: msg_sender,
+        subs: Mutex::new(HashMap::new()),
+    };
 
     state
         .ws_hub
@@ -74,6 +88,12 @@ async fn handle_socket(mut socket: WebSocket, state: Arc<AppState>, user_agent: 
                         if let Ok(conn) = state.db.get().await {
                             db::insert_ws_message(&conn, &id, "received", &text).ok();
                         }
+                        let hub = state.ws_hub.clone();
+                        let id2 = id.clone();
+                        let text2 = text.to_string();
+                        tokio::task::spawn_blocking(move || {
+                            frames::handle_client_frame(&id2, &text2, &hub);
+                        });
                     }
                     Some(Ok(Message::Close(_))) | None => break,
                     _ => {}
@@ -102,6 +122,7 @@ async fn handle_socket(mut socket: WebSocket, state: Arc<AppState>, user_agent: 
     }
 
     state.ws_hub.write().await.clients.remove(&id);
+    frames::presence_leave_all(&state.ws_hub, &id).await;
     if let Ok(conn) = state.db.get().await {
         db::update_ws_disconnect(&conn, &id).ok();
     }
@@ -125,6 +146,10 @@ pub async fn close_client(hub: &RwLock<WSHub>, id: &str) -> bool {
         false
     }
 }
+
+mod broadcast;
+pub use broadcast::*;
+mod frames;
 
 #[cfg(test)]
 mod tests;

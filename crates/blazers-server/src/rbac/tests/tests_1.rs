@@ -120,7 +120,9 @@ fn test_find_permission_by_id_found() {
             [],
         )
         .unwrap();
-    let found = find_permission_by_id(&conn, "p1").unwrap().unwrap();
+    let found = crate::rbac::handlers::find_permission_by_id(&conn, "p1")
+        .unwrap()
+        .unwrap();
     assert_eq!(found.user_id, "u1");
     assert_eq!(found.role, "editor");
     assert_eq!(found.collection, "c1");

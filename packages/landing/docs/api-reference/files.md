@@ -60,3 +60,19 @@ Delete metadata + stored bytes. `204`.
 
 Returns a JPEG thumbnail for image files (decoded, scaled, re-encoded).
 `400`/`500` for non-images or undecodable content.
+
+## Public buckets & file tokens
+
+- Buckets created with `"is_public": true` serve downloads **without** auth.
+- Protected buckets: authenticated users can download, or request a token:
+
+```
+POST /api/buckets/{bucket}/files/{id}/token   → { "token": "...", "expires_in": 3600 }
+GET  /api/buckets/{bucket}/files/{id}?token=<token>
+```
+
+The token endpoint accepts an optional JSON body
+`{ "collection": "...", "record": "..." }` — when present, the token is only
+issued if the caller passes that record's `view_rule` (admins bypass).
+
+The same `?token=` works for `/thumb`.

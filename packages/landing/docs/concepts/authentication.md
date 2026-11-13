@@ -71,8 +71,24 @@ There is no session table and no refresh-token rotation: a token is valid until
 it expires or `JWT_SECRET` changes. For long-lived services, store the token and
 re-login on `401`.
 
-## Password reset / email verification
+## User profiles
 
-Not implemented. PocketBase covers this via its `users` collection options;
-Blazers keeps auth to the essentials. If you need it, front it with a
-[webhook](webhooks.md)-driven flow or request the feature.
+`GET/PATCH /api/auth/me` exposes the user record: `id`, `email`, `verified`,
+custom `data` fields (free-form JSON — Blazers' lightweight take on PocketBase
+auth-record fields), and timestamps.
+
+## Password reset & email verification
+
+Both flows are built in:
+
+- `POST /api/auth/forgot-password` → emails a 1-hour reset link
+  (`{app_url}/reset-password?token=…`); `POST /api/auth/reset-password`
+  exchanges it.
+- `POST /api/auth/verify-email` → emails a 24-hour verification link;
+  `POST /api/auth/verify-email/confirm` marks `verified: true`.
+
+Delivery goes through SMTP configured in `/api/settings`
+(`smtp_host`/`smtp_port`/`smtp_user`/`smtp_from`/`smtp_pass` — the password is
+AES-GCM encrypted at rest). When SMTP is not configured the endpoints still
+succeed and return a `dev_token` in the response so flows remain testable in
+dev.

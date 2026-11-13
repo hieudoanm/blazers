@@ -43,31 +43,43 @@ const COMPARE: CompareRow[] = [
   {
     feature: 'Database',
     pb: 'SQLite',
-    bz: 'SQLite',
+    bz: 'SQLite — schemaless collections',
     sb: 'Postgres',
+  },
+  {
+    feature: 'Records',
+    pb: 'filter / sort / expand, rules',
+    bz: 'filter / sort / expand, 5 rule expressions',
+    sb: 'PostgREST + RLS',
   },
   {
     feature: 'Auth',
     pb: 'Email + OAuth2, request rules',
-    bz: 'Email + JWT (bcrypt), RBAC roles',
+    bz: 'Email + JWT, OAuth2 (4 providers) + OTP + TOTP MFA, record rules, managed users',
     sb: 'GoTrue — email, OAuth2, MFA',
   },
   {
     feature: 'File storage',
     pb: 'Buckets',
-    bz: 'Buckets + thumbnails',
+    bz: 'Buckets + thumbnails + protected files',
     sb: 'S3-compatible storage',
   },
   {
     feature: 'Realtime',
     pb: 'SSE subscriptions',
-    bz: 'WebSocket + SSE + pub/sub',
+    bz: 'WebSocket record events (oldRecord, filters) + presence + SSE + pub/sub',
     sb: 'Realtime (Postgres changes)',
+  },
+  {
+    feature: 'Batch requests',
+    pb: '?batch=1',
+    bz: 'POST /api/batch (≤50 calls)',
+    sb: '—',
   },
   {
     feature: 'Extensibility',
     pb: 'JS hooks (pb_hooks)',
-    bz: 'HMAC webhooks + cron → HTTP',
+    bz: 'HMAC webhooks + sync record hooks + cron → HTTP',
     sb: 'Edge Functions (Deno)',
   },
   {
@@ -97,7 +109,7 @@ const COMPARE: CompareRow[] = [
   {
     feature: 'Ops extras',
     pb: 'Backups, logs',
-    bz: 'Cache, secrets vault, notifications, logs',
+    bz: 'Cache, secrets vault, notifications, logs, scheduled backups, settings UI',
     sb: 'Managed add-ons (Auth, Realtime, …)',
   },
 ];
@@ -148,17 +160,17 @@ const Terminal: FC<TerminalProps> = ({ lines }) => (
 const FEATURES: Feature[] = [
   {
     title: 'Auth & permissions',
-    body: 'Register, login, JWT bearer tokens, bcrypt passwords and a per-collection permission system — public, user and admin rules enforced on every request.',
+    body: 'Register, login, JWT bearer tokens, bcrypt passwords, password reset and email verification — plus per-collection record rules with @request.auth expressions.',
     icon: LuLock,
   },
   {
     title: 'Collections & records',
-    body: 'Schema-less collections stored as dynamic SQLite tables. Full CRUD with paging, search, sorting and JSON-schema validation.',
+    body: 'Schema-less collections stored as dynamic SQLite tables. CRUD with paging, search, filter expressions, sorting, relation expand and JSON-schema validation.',
     icon: LuDatabase,
   },
   {
     title: 'File buckets',
-    body: 'Public and private buckets, streaming uploads, downloads and on-the-fly image thumbnails — files live next to the database.',
+    body: 'Public and private buckets, uploads, downloads, on-the-fly thumbnails and time-limited file tokens for protected files.',
     icon: LuFolderUp,
   },
   {

@@ -9,6 +9,12 @@ HTTP + features crate for Blazers. See the root [`AGENTS.md`](../../AGENTS.md).
   TCP listener (`blazers kv`), sharing `CacheStore` with the REST cache API.
 - `AppState` (in `handlers.rs`) is the shared context: db pool, storage dir,
   http client, secrets key, ws/sse/log/pubsub hubs, rate limiter.
+- `mailer.rs` (SMTP via lettre, config in `_settings`), `backups.rs`
+  (scheduled `VACUUM INTO` snapshots from `backup_schedule` setting).
+- Record rules: five per-collection expressions (`*_rule`) evaluated by
+  `rbac::check_rule_view`/`check_record_rule` against `blazers_core::filter`
+  with an `@request.auth` context; `?filter=`/`?sort=`/`?expand=` on record
+  lists; WS record-change broadcasts via `websocket::broadcast_record`.
 - All routes except health/register/login/openapi require
   `Authorization: Bearer <jwt>`; permissions enforced via `_permissions`.
 - Admin dashboard: `public/index.html` embedded by `rust-embed` — HTMX, no

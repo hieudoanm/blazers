@@ -5,7 +5,7 @@ fn test_find_permission_by_id_not_found() {
     let conn = rusqlite::Connection::open_in_memory().unwrap();
     create_perms_table(&conn);
     assert!(
-        find_permission_by_id(&conn, "nonexistent")
+        crate::rbac::handlers::find_permission_by_id(&conn, "nonexistent")
             .unwrap()
             .is_none()
     );

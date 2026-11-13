@@ -41,13 +41,16 @@ pub fn paths() -> serde_json::Map<String, serde_json::Value> {
             },
             "/api/collections/{name}/records": {
                 "get": {
-                    "summary": "List records with pagination and search",
+                    "summary": "List records with filter, sort, expand and pagination",
                     "tags": ["Records"],
                     "parameters": [
                         {"name": "name", "in": "path", "required": true, "schema": {"type": "string"}},
                         {"name": "page", "in": "query", "schema": {"type": "integer", "default": 1}},
                         {"name": "per_page", "in": "query", "schema": {"type": "integer", "default": 20}},
-                        {"name": "search", "in": "query", "schema": {"type": "string"}, "description": "Full-text search on data field"}
+                        {"name": "search", "in": "query", "schema": {"type": "string"}, "description": "Full-text search on data field"},
+                        {"name": "filter", "in": "query", "schema": {"type": "string"}, "description": "PocketBase-style filter expression, e.g. status = 'published' && views > 10"},
+                        {"name": "sort", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated sort fields, '-' prefix for descending, e.g. -created,title"},
+                        {"name": "expand", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated relation fields to expand (values 'collection:id')"}
                     ],
                     "responses": {"200": {"description": "Paginated records", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RecordsPage"}}}}}
                 },

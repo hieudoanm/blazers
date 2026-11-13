@@ -34,32 +34,38 @@ pub fn register_user(conn: &Connection, email: &str, password: &str) -> Result<U
     Ok(UserResponse {
         id,
         email: email.to_string(),
+        data: serde_json::json!({}),
+        verified: false,
+        mfa_enabled: false,
         created_at: now.clone(),
         updated_at: now,
     })
 }
 
-pub fn login_user(conn: &Connection, email: &str, password: &str) -> Result<LoginResponse> {
-    let user = db::find_user_by_email(conn, email)?;
-    match user {
-        Some((id, email, created_at, updated_at, hashed_pwd)) => {
-            if !verify(password, &hashed_pwd).unwrap_or(false) {
-                return Err(AppError::Unauthorized("invalid credentials".into()));
-            }
-            let token = generate_token(&id, &email)
-                .map_err(|e| AppError::Internal(format!("generate token: {e}")))?;
-            Ok(LoginResponse {
-                user: UserResponse {
-                    id,
-                    email,
-                    created_at,
-                    updated_at,
-                },
-                token,
-            })
-        }
-        None => Err(AppError::Unauthorized("invalid credentials".into())),
+/// Verifies email+password and returns the full user record (no token).
+pub fn verify_credentials(conn: &Connection, email: &str, password: &str) -> Result<UserRecord> {
+    let user = db::find_user_by_email(conn, email)?
+        .and_then(|(id, _, _, _, _)| db::get_user(conn, &id).ok().flatten())
+        .ok_or_else(|| AppError::Unauthorized("invalid credentials".into()))?;
+    if !verify(password, &user.password).unwrap_or(false) {
+        return Err(AppError::Unauthorized("invalid credentials".into()));
     }
+    Ok(user)
+}
+
+pub fn login_user(conn: &Connection, email: &str, password: &str) -> Result<LoginResponse> {
+    let user = verify_credentials(conn, email, password)?;
+    let token = issue_token(&user.id, &user.email)?;
+    Ok(LoginResponse {
+        user: user_response(&user),
+        token,
+    })
+}
+
+/// Issues a standard user JWT (login response token). Used by login, OTP,
+/// OAuth and impersonation flows.
+pub fn issue_token(user_id: &str, email: &str) -> Result<String> {
+    generate_token(user_id, email).map_err(|e| AppError::Internal(format!("generate token: {e}")))
 }
 
 fn generate_token(
@@ -88,6 +94,54 @@ pub fn validate_token(token_str: &str) -> std::result::Result<Claims, AppError> 
     )
     .map_err(|_| AppError::Unauthorized("invalid token".into()))?;
     Ok(token.claims)
+}
+
+/// Short-lived token granting access to a single protected file.
+/// Format: `file:<file_id>` embedded in the JWT subject claim.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FileTokenClaims {
+    pub file_id: String,
+    pub exp: usize,
+    pub iat: usize,
+}
+
+pub fn generate_file_token(file_id: &str, ttl_secs: usize) -> String {
+    let now = Utc::now().timestamp() as usize;
+    let claims = FileTokenClaims {
+        file_id: file_id.to_string(),
+        exp: now + ttl_secs,
+        iat: now,
+    };
+    encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret(jwt_secret().as_bytes()),
+    )
+    .unwrap_or_default()
+}
+
+/// Validates a file token and returns the file id it was issued for.
+pub fn validate_file_token(token_str: &str) -> std::result::Result<String, AppError> {
+    let token = decode::<FileTokenClaims>(
+        token_str,
+        &DecodingKey::from_secret(jwt_secret().as_bytes()),
+        &Validation::default(),
+    )
+    .map_err(|_| AppError::Unauthorized("invalid file token".into()))?;
+    Ok(token.claims.file_id)
+}
+
+/// Serializes a user record for API responses (no password).
+pub fn user_response(u: &UserRecord) -> UserResponse {
+    UserResponse {
+        id: u.id.clone(),
+        email: u.email.clone(),
+        data: u.data.clone(),
+        verified: u.verified,
+        mfa_enabled: u.mfa_enabled,
+        created_at: u.created_at.clone(),
+        updated_at: u.updated_at.clone(),
+    }
 }
 
 #[cfg(test)]

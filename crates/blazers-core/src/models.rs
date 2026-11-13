@@ -4,6 +4,7 @@
 //! using `blazers_core::models::*` unchanged.
 
 mod auth;
+mod batch;
 mod cache;
 mod collections;
 mod cron;
@@ -17,6 +18,7 @@ mod webhooks;
 mod ws;
 
 pub use auth::*;
+pub use batch::*;
 pub use cache::*;
 pub use collections::*;
 pub use cron::*;

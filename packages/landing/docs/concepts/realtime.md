@@ -21,7 +21,15 @@ Server-side you can:
 - broadcast to all — `POST /api/websockets/broadcast`
 - list/audit connections and messages via the REST endpoints
 
-Useful for chat, live cursors, game state — anything needing client→server push.
+Clients can also **subscribe** to collections with a JSON frame
+(`{"action":"subscribe","collection":"posts"}`, `"*"` for all). Record
+create/update/delete API calls then push `{type:"record", action, collection,
+record}` events automatically — the PocketBase-style change feed. Update and
+delete events also carry `oldRecord` (the record before the change) so clients
+can diff or revert.
+
+Useful for chat, live cursors, game state, and live data — anything needing
+client→server push or change notifications.
 
 ## Server-Sent Events — three streams
 

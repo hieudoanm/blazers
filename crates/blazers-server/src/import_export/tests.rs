@@ -23,6 +23,12 @@ fn export_data_with_data_round_trip() {
         collections: vec![Collection {
             name: "users".into(),
             schema: "{\"name\":\"string\"}".into(),
+            list_rule: String::new(),
+            view_rule: String::new(),
+            create_rule: String::new(),
+            update_rule: String::new(),
+            delete_rule: String::new(),
+            r#type: "records".to_string(),
             created_at: "2024-01-01T00:00:00Z".into(),
             updated_at: "2024-01-01T00:00:00Z".into(),
         }],

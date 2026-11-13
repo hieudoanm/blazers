@@ -47,6 +47,7 @@ pub async fn serve_http() {
     });
 
     cronjobs::start_cron_scheduler(state.clone()).await;
+    tokio::spawn(crate::backups::scheduler(state.clone()));
 
     {
         let rate_limiter = state.rate_limiter.clone();

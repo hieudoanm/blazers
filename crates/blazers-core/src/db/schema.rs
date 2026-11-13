@@ -142,3 +142,27 @@ pub fn build_search_clause(search: &str) -> Option<(String, Vec<String>)> {
         .join(" AND ");
     Some((clause, words))
 }
+
+pub(crate) fn ensure_column(
+    conn: &Connection,
+    table: &str,
+    column: &str,
+    decl: &str,
+) -> Result<()> {
+    let mut stmt = conn
+        .prepare(&format!("PRAGMA table_info({table})"))
+        .map_err(|e| AppError::Internal(e.to_string()))?;
+    let exists = stmt
+        .query_map([], |row| row.get::<_, String>(1))
+        .map_err(|e| AppError::Internal(e.to_string()))?
+        .filter_map(|r| r.ok())
+        .any(|name| name == column);
+    if !exists {
+        conn.execute(
+            &format!("ALTER TABLE {table} ADD COLUMN {column} {decl}"),
+            [],
+        )
+        .map_err(|e| AppError::Internal(format!("add column {table}.{column}: {e}")))?;
+    }
+    Ok(())
+}

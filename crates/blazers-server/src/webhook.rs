@@ -15,6 +15,11 @@ type HmacSha256 = Hmac<Sha256>;
 pub const EVENT_RECORD_CREATE: &str = "record.create";
 pub const EVENT_RECORD_UPDATE: &str = "record.update";
 pub const EVENT_RECORD_DELETE: &str = "record.delete";
+/// Synchronous pre-write hooks (JSVM-lite): the handler awaits the webhook
+/// and can mutate the record payload or cancel the operation.
+pub const EVENT_RECORD_BEFORE_CREATE: &str = "record.before_create";
+pub const EVENT_RECORD_BEFORE_UPDATE: &str = "record.before_update";
+pub const EVENT_RECORD_BEFORE_DELETE: &str = "record.before_delete";
 pub const EVENT_COLLECTION_CREATE: &str = "collection.create";
 pub const EVENT_COLLECTION_DELETE: &str = "collection.delete";
 pub const EVENT_BUCKET_CREATE: &str = "bucket.create";
@@ -46,6 +51,9 @@ pub fn validate_events(events: &[String]) -> std::result::Result<(), String> {
             | EVENT_PUBSUB_TOPIC_CREATE
             | EVENT_PUBSUB_TOPIC_DELETE
             | EVENT_PUBSUB_MESSAGE_CREATE
+            | EVENT_RECORD_BEFORE_CREATE
+            | EVENT_RECORD_BEFORE_UPDATE
+            | EVENT_RECORD_BEFORE_DELETE
             | crate::cronjobs::EVENT_CRONJOB_CREATE
             | crate::cronjobs::EVENT_CRONJOB_UPDATE
             | crate::cronjobs::EVENT_CRONJOB_DELETE => {}
@@ -154,6 +162,9 @@ async fn send_webhook(state: &Arc<AppState>, hook: &Webhook, event: &str, body_s
         let _ = db::insert_webhook_log(&conn, &log);
     }
 }
+
+mod hooks;
+pub use hooks::*;
 
 #[cfg(test)]
 mod tests;

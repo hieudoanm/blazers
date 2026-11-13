@@ -68,6 +68,34 @@ to stay well under it.
 expose a Blazers instance holding sensitive data to untrusted origins without a
 reverse-proxy layer in front.
 
+## Batch requests
+
+`POST /api/batch` runs several API calls in one round-trip (PocketBase
+parity). Body:
+
+```json
+{ "requests": [
+    { "method": "POST", "url": "/api/collections/items/records",
+      "body": { "data": { "n": 1 } } },
+    { "method": "GET", "url": "/api/collections/items/records" }
+]}
+```
+
+PocketBase-style `?batch=1` also works on **any** `/api/*` route: send the
+same payload as a bare JSON array (or the `requests` envelope) and the
+response is the array of results — e.g.
+`POST /api/collections?batch=1`.
+
+Each sub-request is dispatched through the real router — auth, RBAC and
+validation all apply. Response is an array in request order:
+
+```json
+[ { "status": 200, "body": { ... } }, { "status": 404, "body": { "error": "..." } } ]
+```
+
+Max 50 sub-requests; `/api/batch` itself and non-`/api/` URLs are rejected
+per-item with `400`.
+
 ## OpenAPI & docs
 
 - `GET /api/openapi.json` — full OpenAPI 3 spec

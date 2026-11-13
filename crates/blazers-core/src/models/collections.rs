@@ -1,15 +1,41 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+#[derive(Debug, Clone, Default)]
+pub struct CollectionRules {
+    pub list_rule: String,
+    pub view_rule: String,
+    pub create_rule: String,
+    pub update_rule: String,
+    pub delete_rule: String,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Collection {
     pub name: String,
     pub schema: String,
+    #[serde(default)]
+    pub list_rule: String,
+    #[serde(default)]
+    pub view_rule: String,
+    #[serde(default)]
+    pub create_rule: String,
+    #[serde(default)]
+    pub update_rule: String,
+    #[serde(default)]
+    pub delete_rule: String,
+    /// "records" for data collections, "auth" for the managed users collection.
+    #[serde(default = "default_collection_type")]
+    pub r#type: String,
     pub created_at: String,
     pub updated_at: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+fn default_collection_type() -> String {
+    "records".to_string()
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Record {
     pub id: String,
     pub data: Value,
@@ -65,9 +91,22 @@ pub struct RecordListParams {
     pub page: Option<i64>,
     pub per_page: Option<i64>,
     pub search: Option<String>,
+    pub filter: Option<String>,
+    pub sort: Option<String>,
+    pub expand: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct UpdateCollectionRequest {
     pub schema: Option<String>,
+    #[serde(default)]
+    pub list_rule: Option<String>,
+    #[serde(default)]
+    pub view_rule: Option<String>,
+    #[serde(default)]
+    pub create_rule: Option<String>,
+    #[serde(default)]
+    pub update_rule: Option<String>,
+    #[serde(default)]
+    pub delete_rule: Option<String>,
 }

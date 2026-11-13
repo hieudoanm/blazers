@@ -16,6 +16,28 @@ List records with pagination and search.
 | `page`     | `1`     | ≥ 1                            |
 | `per_page` | `20`    | `1..=100`                      |
 | `search`   | `""`    | substring match on record data |
+| `filter`   | —       | PocketBase-style expression    |
+| `sort`     | —       | comma-separated fields         |
+| `expand`   | —       | comma-separated relations      |
+
+**`filter`** — expression over record fields and `@request.auth.*`:
+
+```
+status = 'published' && views > 10
+owner = @request.auth.id || @request.auth.role = 'admin'
+title ~ 'rust' || !draft
+```
+
+Operators: `=`, `!=`, `>`, `>=`, `<`, `<=`, `~`/`!~` (case-insensitive
+contains), `&&`, `||`, `!`, parentheses. Literals: `'str'`, numbers,
+`true`/`false`/`null`. Dot paths reach nested objects (`author.role`).
+
+**`sort`** — `field,-other`: `-` prefix = descending; missing values sort
+last. e.g. `sort=-created,title`.
+
+**`expand`** — fetches related records. A field whose value is
+`"collection:id"` (or a bare id when a collection shares the field name) is
+expanded into `data.expand_<field>` with the target record.
 
 **Response `200`**
 
@@ -69,4 +91,11 @@ Delete a record. `204`. Fires `record.delete` webhook.
 
 - `400` — schema validation failure (missing required field, wrong type)
 - `404` — collection or record not found
-- `403` — RBAC denies the role
+- `403` — RBAC denies the role, or a collection record rule rejects access
+
+## Record rules
+
+Collections carry five optional rule expressions — `list_rule`, `view_rule`,
+`create_rule`, `update_rule`, `delete_rule` — set via
+`PATCH /api/collections/{name}`. Empty = allow; admins bypass. See
+[Permissions](../concepts/permissions.md#record-rules).

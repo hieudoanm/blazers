@@ -86,6 +86,9 @@ fn login_response_serialization() {
     let user = UserResponse {
         id: "u1".into(),
         email: "a@b.com".into(),
+        data: serde_json::json!({}),
+        verified: false,
+        mfa_enabled: false,
         created_at: "2024-01-01T00:00:00Z".into(),
         updated_at: "2024-01-01T00:00:00Z".into(),
     };

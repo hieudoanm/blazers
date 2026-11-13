@@ -19,6 +19,47 @@ The server records the connection in `ws_connections` and every inbound text
 frame in `ws_messages` (`direction: "received"`). Outbound sends via the REST
 endpoints are logged as `direction: "sent"`.
 
+## Subscriptions & record events
+
+Send a JSON text frame to subscribe:
+
+```json
+{ "action": "subscribe", "collection": "posts" }
+{ "action": "subscribe", "collection": "*" }
+{ "action": "subscribe", "collection": "posts", "filter": "views > 50" }
+{ "action": "unsubscribe", "collection": "posts" }
+```
+
+`"*"` subscribes to every collection. An optional `filter` applies a
+PocketBase-style expression to each record event — the event is only
+delivered when it matches (e.g. `"filter": "status = 'published'"`).
+`@request.auth.*` resolves to null since WS connections are anonymous. Whenever a record is created, updated or
+deleted through the REST API, subscribers receive:
+
+```json
+{ "type": "record", "action": "create",
+  "collection": "posts", "record": { "id": "...", "data": {...} } }
+```
+
+`action` is one of `create`, `update`, `delete`. `update` and `delete` events
+also carry `oldRecord` — the record as it was before the change.
+
+## Presence
+
+Channels let clients announce availability (chat "typing…", live cursors,
+who's online):
+
+```json
+{ "action": "presence_join", "channel": "room-1" }
+{ "action": "presence", "channel": "room-1", "state": { "cursor": {"x": 10} } }
+{ "action": "presence_leave", "channel": "room-1" }
+```
+
+`presence` also auto-joins. Members receive
+`{ "type": "presence", "action": "join"|"state"|"leave", "channel": "...",
+"client": "<id>", "state": {...} }`; disconnects broadcast `leave`
+automatically.
+
 ## `GET /api/websockets` — list connections
 
 Active and recently-closed connections:
