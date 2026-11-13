@@ -1,0 +1,11 @@
+# dependencies
+node_modules
+dist
+
+# caches
+coverage
+.vitest
+
+# misc
+.DS_Store
+*.tsbuildinfo

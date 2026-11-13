@@ -10,9 +10,7 @@ auth, a dynamic database, file storage, realtime, webhooks, cron jobs,
 encrypted secrets, pub/sub, an admin dashboard and an MCP server. No Docker,
 no external services: everything persists to one SQLite file.
 
-<p align="center">
-  <img src="assets/branding/png/og.png" alt="blazers — a blazing fast Back-end as a Service" width="720">
-</p>
+![blazers — a blazing fast Back-end as a Service](assets/branding/png/og.png)
 
 **Live demo:** <https://hieudoanm.github.io/blazers/>
 

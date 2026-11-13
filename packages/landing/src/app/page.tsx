@@ -7,6 +7,7 @@ import Hero from '@/components/molecules/Hero';
 import CTA from '@/components/molecules/CTA';
 import {
   LuBookOpen,
+  LuCheck,
   LuCpu,
   LuDatabase,
   LuFolderUp,
@@ -14,6 +15,7 @@ import {
   LuLayoutDashboard,
   LuLock,
   LuWebhook,
+  LuX,
   LuZap,
 } from 'react-icons/lu';
 
@@ -26,93 +28,151 @@ const GITHUB = 'https://github.com/hieudoanm/blazers';
 const LOGO =
   process.env.NODE_ENV === 'production' ? '/blazers/logo.svg' : '/logo.svg';
 
+type Support = boolean | 'na';
+
 interface CompareRow {
   feature: string;
-  pb: string;
-  bz: string;
-  sb: string;
+  pb: Support;
+  bz: Support;
+  sb: Support;
 }
 
-const COMPARE: CompareRow[] = [
+interface CompareGroup {
+  title: string;
+  rows: CompareRow[];
+}
+
+const COMPARE_GROUPS: CompareGroup[] = [
   {
-    feature: 'Deployment',
-    pb: '1 Go binary + pb_data/',
-    bz: '1 Rust binary + ~/.blazers/',
-    sb: 'Postgres + GoTrue + PostgREST + Realtime + Storage',
+    title: 'Core & data',
+    rows: [
+      { feature: 'SQLite database', pb: true, bz: true, sb: false },
+      {
+        feature: 'Schema-less collections',
+        pb: false,
+        bz: true,
+        sb: false,
+      },
+      {
+        feature: 'Typed collection schemas',
+        pb: true,
+        bz: false,
+        sb: true,
+      },
+      { feature: 'Record CRUD & querying', pb: true, bz: true, sb: true },
+      { feature: 'Filter / sort / expand', pb: true, bz: true, sb: true },
+      {
+        feature: 'Per-collection record rules',
+        pb: true,
+        bz: true,
+        sb: true,
+      },
+      { feature: 'Batch requests', pb: true, bz: true, sb: 'na' },
+      { feature: 'Import / export', pb: false, bz: true, sb: true },
+    ],
   },
   {
-    feature: 'Database',
-    pb: 'SQLite',
-    bz: 'SQLite — schemaless collections',
-    sb: 'Postgres',
+    title: 'Auth & users',
+    rows: [
+      { feature: 'Email + password auth', pb: true, bz: true, sb: true },
+      {
+        feature: 'Email verification & password reset',
+        pb: true,
+        bz: true,
+        sb: true,
+      },
+      { feature: 'OAuth2 social login', pb: true, bz: true, sb: true },
+      { feature: 'OTP / magic-code login', pb: true, bz: true, sb: true },
+      { feature: 'MFA (TOTP)', pb: true, bz: true, sb: true },
+      { feature: 'User impersonation', pb: true, bz: true, sb: true },
+      { feature: 'Anonymous sign-in', pb: false, bz: false, sb: true },
+      { feature: 'SSO / SAML', pb: false, bz: false, sb: true },
+    ],
   },
   {
-    feature: 'Records',
-    pb: 'filter / sort / expand, rules',
-    bz: 'filter / sort / expand, 5 rule expressions',
-    sb: 'PostgREST + RLS',
+    title: 'Files & storage',
+    rows: [
+      { feature: 'File buckets', pb: true, bz: true, sb: true },
+      { feature: 'Public file URLs', pb: true, bz: true, sb: true },
+      {
+        feature: 'Protected files & tokens',
+        pb: true,
+        bz: true,
+        sb: true,
+      },
+      {
+        feature: 'Tokens honor record rules',
+        pb: true,
+        bz: true,
+        sb: true,
+      },
+      { feature: 'Image thumbnails', pb: true, bz: true, sb: true },
+      { feature: 'S3-compatible storage', pb: false, bz: false, sb: true },
+      { feature: 'Local disk storage', pb: true, bz: true, sb: false },
+      { feature: 'CDN-backed delivery', pb: false, bz: false, sb: true },
+    ],
   },
   {
-    feature: 'Auth',
-    pb: 'Email + OAuth2, request rules',
-    bz: 'Email + JWT, OAuth2 (4 providers) + OTP + TOTP MFA, record rules, managed users',
-    sb: 'GoTrue — email, OAuth2, MFA',
+    title: 'Realtime',
+    rows: [
+      { feature: 'Record change events', pb: true, bz: true, sb: true },
+      {
+        feature: 'oldRecord on update/delete',
+        pb: true,
+        bz: true,
+        sb: true,
+      },
+      {
+        feature: 'Per-subscription filters',
+        pb: true,
+        bz: true,
+        sb: true,
+      },
+      { feature: 'Presence', pb: false, bz: true, sb: true },
+      { feature: 'SSE streaming', pb: true, bz: true, sb: false },
+      { feature: 'Pub/sub channels', pb: false, bz: true, sb: true },
+      { feature: 'WebSocket transport', pb: false, bz: true, sb: true },
+      {
+        feature: 'Wildcard subscriptions',
+        pb: false,
+        bz: true,
+        sb: true,
+      },
+    ],
   },
   {
-    feature: 'File storage',
-    pb: 'Buckets',
-    bz: 'Buckets + thumbnails + protected files',
-    sb: 'S3-compatible storage',
-  },
-  {
-    feature: 'Realtime',
-    pb: 'SSE subscriptions',
-    bz: 'WebSocket record events (oldRecord, filters) + presence + SSE + pub/sub',
-    sb: 'Realtime (Postgres changes)',
-  },
-  {
-    feature: 'Batch requests',
-    pb: '?batch=1',
-    bz: 'POST /api/batch (≤50 calls)',
-    sb: '—',
-  },
-  {
-    feature: 'Extensibility',
-    pb: 'JS hooks (pb_hooks)',
-    bz: 'HMAC webhooks + sync record hooks + cron → HTTP',
-    sb: 'Edge Functions (Deno)',
-  },
-  {
-    feature: 'Scheduled jobs',
-    pb: '—',
-    bz: 'Cron expressions, built-in',
-    sb: 'Scheduled Edge Functions',
-  },
-  {
-    feature: 'Admin UI',
-    pb: 'Bundled SPA',
-    bz: 'Embedded HTMX at /',
-    sb: 'Supabase Studio',
-  },
-  {
-    feature: 'API spec',
-    pb: '—',
-    bz: 'OpenAPI + Swagger UI',
-    sb: 'OpenAPI (PostgREST)',
-  },
-  {
-    feature: 'AI / agent access',
-    pb: '—',
-    bz: 'MCP server (stdio)',
-    sb: '—',
-  },
-  {
-    feature: 'Ops extras',
-    pb: 'Backups, logs',
-    bz: 'Cache, secrets vault, notifications, logs, scheduled backups, settings UI',
-    sb: 'Managed add-ons (Auth, Realtime, …)',
+    title: 'Extensibility & ops',
+    rows: [
+      { feature: 'Outbound webhooks', pb: false, bz: true, sb: true },
+      {
+        feature: 'Server-side record hooks',
+        pb: true,
+        bz: true,
+        sb: true,
+      },
+      {
+        feature: 'JS / edge-function runtime',
+        pb: true,
+        bz: false,
+        sb: true,
+      },
+      { feature: 'Cron jobs', pb: true, bz: true, sb: true },
+      { feature: 'Secrets vault', pb: false, bz: true, sb: true },
+      { feature: 'Admin dashboard', pb: true, bz: true, sb: true },
+      { feature: 'OpenAPI + API docs', pb: false, bz: true, sb: true },
+      { feature: 'MCP server', pb: false, bz: true, sb: true },
+    ],
   },
 ];
+
+function support(value: Support) {
+  if (value === 'na') return <span className="text-gray-300">-</span>;
+  return value ? (
+    <LuCheck aria-label="Supported" className="text-success size-4" />
+  ) : (
+    <LuX aria-label="Not supported" className="text-error size-4" />
+  );
+}
 
 type TokKind =
   'prompt' | 'cmd' | 'flag' | 'str' | 'key' | 'url' | 'dim' | 'ok' | 'err';
@@ -294,48 +354,66 @@ const Home: NextPage = () => (
               without Postgres, GoTrue or a fleet of services.
             </p>
           </div>
-          <div className="overflow-x-auto rounded-2xl border border-gray-200">
-            <table className="w-full border-collapse text-sm [&_tbody_tr:last-child>td]:border-b-0">
-              <thead>
-                <tr>
-                  <th className="w-44 border-b border-gray-200 bg-gray-50 px-5 py-3.5 text-left align-bottom font-semibold">
-                    Feature
-                  </th>
-                  <th className="border-b border-l border-gray-200 bg-gray-50 px-5 py-3.5 text-left align-bottom font-semibold">
-                    PocketBase
-                  </th>
-                  <th className="bg-primary/10 border-b border-l border-gray-200 px-5 py-3.5 text-left align-bottom">
-                    <span className="text-primary flex items-center gap-2 font-bold">
-                      Blazers
-                      <span className="badge badge-primary uppercase">
-                        rust
-                      </span>
-                    </span>
-                  </th>
-                  <th className="border-b border-l border-gray-200 bg-gray-50 px-5 py-3.5 text-left align-bottom font-semibold">
-                    Supabase
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {COMPARE.map((row) => (
-                  <tr key={row.feature} className="group">
-                    <td className="border-b border-gray-200 px-5 py-3.5 align-top font-medium text-gray-500">
-                      {row.feature}
-                    </td>
-                    <td className="border-b border-l border-gray-200 px-5 py-3.5 align-top text-gray-500">
-                      {row.pb}
-                    </td>
-                    <td className="bg-primary/5 group-hover:bg-primary/10 border-b border-l border-gray-200 px-5 py-3.5 align-top font-medium text-gray-900">
-                      {row.bz}
-                    </td>
-                    <td className="border-b border-l border-gray-200 px-5 py-3.5 align-top text-gray-500">
-                      {row.sb}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid gap-6 md:grid-cols-2">
+            {COMPARE_GROUPS.map((group) => (
+              <div
+                key={group.title}
+                className="overflow-x-auto rounded-2xl border border-gray-200">
+                <table className="w-full border-collapse text-xs [&_tbody_tr:last-child>td]:border-b-0">
+                  <thead>
+                    <tr>
+                      <th className="border-b border-gray-200 bg-gray-50 px-5 py-3.5 text-left align-bottom font-semibold whitespace-nowrap">
+                        {group.title}
+                      </th>
+                      <th className="border-b border-l border-gray-200 bg-gray-50 px-5 py-3.5 text-left align-bottom font-semibold">
+                        <span className="flex flex-col items-start gap-1">
+                          <span className="badge badge-xs bg-teal-700 text-teal-50 uppercase">
+                            go
+                          </span>
+                          <span>PocketBase</span>
+                        </span>
+                      </th>
+                      <th className="bg-primary/10 border-b border-l border-gray-200 px-5 py-3.5 text-left align-bottom">
+                        <span className="flex flex-col items-start gap-1">
+                          <span className="badge badge-primary badge-xs uppercase">
+                            rust
+                          </span>
+                          <span className="text-primary font-bold">
+                            Blazers
+                          </span>
+                        </span>
+                      </th>
+                      <th className="border-b border-l border-gray-200 bg-gray-50 px-5 py-3.5 text-left align-bottom font-semibold">
+                        <span className="flex flex-col items-start gap-1">
+                          <span className="badge badge-xs bg-blue-900 text-blue-100 uppercase">
+                            ts
+                          </span>
+                          <span>Supabase</span>
+                        </span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.rows.map((row) => (
+                      <tr key={row.feature} className="group">
+                        <td className="border-b border-gray-200 px-5 py-3 align-top font-medium whitespace-nowrap text-gray-500">
+                          {row.feature}
+                        </td>
+                        <td className="border-b border-l border-gray-200 px-5 py-3 align-top text-gray-500">
+                          {support(row.pb)}
+                        </td>
+                        <td className="bg-primary/5 group-hover:bg-primary/10 border-b border-l border-gray-200 px-5 py-3 align-top font-medium text-gray-900">
+                          {support(row.bz)}
+                        </td>
+                        <td className="border-b border-l border-gray-200 px-5 py-3 align-top text-gray-500">
+                          {support(row.sb)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
           </div>
           <p className="mt-4 text-center text-sm text-gray-500">
             Comparing deployment model, auth, storage, realtime and ops surface

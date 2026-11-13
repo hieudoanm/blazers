@@ -70,21 +70,25 @@ reverse-proxy layer in front.
 
 ## Batch requests
 
-`POST /api/batch` runs several API calls in one round-trip (PocketBase
-parity). Body:
+`POST /api/batch` runs several API calls in one round-trip (PocketBase parity).
+Body:
 
 ```json
-{ "requests": [
-    { "method": "POST", "url": "/api/collections/items/records",
-      "body": { "data": { "n": 1 } } },
+{
+  "requests": [
+    {
+      "method": "POST",
+      "url": "/api/collections/items/records",
+      "body": { "data": { "n": 1 } }
+    },
     { "method": "GET", "url": "/api/collections/items/records" }
-]}
+  ]
+}
 ```
 
-PocketBase-style `?batch=1` also works on **any** `/api/*` route: send the
-same payload as a bare JSON array (or the `requests` envelope) and the
-response is the array of results — e.g.
-`POST /api/collections?batch=1`.
+PocketBase-style `?batch=1` also works on **any** `/api/*` route: send the same
+payload as a bare JSON array (or the `requests` envelope) and the response is
+the array of results — e.g. `POST /api/collections?batch=1`.
 
 Each sub-request is dispatched through the real router — auth, RBAC and
 validation all apply. Response is an array in request order:
