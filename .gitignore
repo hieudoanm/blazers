@@ -10,3 +10,5 @@ node_modules/
 dist/
 packages/landing/.next/
 packages/landing/out/
+.turbo/
+browsers/

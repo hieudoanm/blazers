@@ -31,10 +31,10 @@ Send a JSON text frame to subscribe:
 ```
 
 `"*"` subscribes to every collection. An optional `filter` applies a
-PocketBase-style expression to each record event — the event is only
-delivered when it matches (e.g. `"filter": "status = 'published'"`).
-`@request.auth.*` resolves to null since WS connections are anonymous. Whenever a record is created, updated or
-deleted through the REST API, subscribers receive:
+PocketBase-style expression to each record event — the event is only delivered
+when it matches (e.g. `"filter": "status = 'published'"`). `@request.auth.*`
+resolves to null since WS connections are anonymous. Whenever a record is
+created, updated or deleted through the REST API, subscribers receive:
 
 ```json
 { "type": "record", "action": "create",
@@ -46,8 +46,8 @@ also carry `oldRecord` — the record as it was before the change.
 
 ## Presence
 
-Channels let clients announce availability (chat "typing…", live cursors,
-who's online):
+Channels let clients announce availability (chat "typing…", live cursors, who's
+online):
 
 ```json
 { "action": "presence_join", "channel": "room-1" }
@@ -56,9 +56,8 @@ who's online):
 ```
 
 `presence` also auto-joins. Members receive
-`{ "type": "presence", "action": "join"|"state"|"leave", "channel": "...",
-"client": "<id>", "state": {...} }`; disconnects broadcast `leave`
-automatically.
+`{ "type": "presence", "action": "join"|"state"|"leave", "channel": "...", "client": "<id>", "state": {...} }`;
+disconnects broadcast `leave` automatically.
 
 ## `GET /api/websockets` — list connections
 

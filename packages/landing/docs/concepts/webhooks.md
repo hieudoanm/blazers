@@ -27,13 +27,13 @@ cronjob.create    cronjob.update    cronjob.delete
 
 The three `record.before_*` events are **synchronous request hooks** — a
 JSVM-lite escape hatch. Before a record write, Blazers awaits each matching
-webhook (5s timeout) with
-`{"event", "data": {"collection", "record", "auth"}}`. The response can:
+webhook (5s timeout) with `{"event", "data": {"collection", "record", "auth"}}`.
+The response can:
 
 - return `{"record": {...}}` — fields are shallow-merged into the record's
   `data` before validation and insert/update;
-- return `{"cancel": true}` or a non-2xx status — aborts the request with
-  `400` (for `before_delete`, nothing is deleted);
+- return `{"cancel": true}` or a non-2xx status — aborts the request with `400`
+  (for `before_delete`, nothing is deleted);
 - return anything else — the write proceeds unchanged.
 
 Hook deliveries are also written to the webhook log like normal events.

@@ -1,0 +1,39 @@
+{
+  "name": "@blazers/sdk",
+  "version": "0.0.1",
+  "description": "TypeScript client SDK for the Blazers BaaS — auth (incl. OAuth2, OTP, MFA, refresh), collections/records, realtime, files, batch.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.6.6",
+    "eslint": "10.14.0",
+    "prettier": "3.10.1",
+    "typescript-eslint": "8.72.2",
+    "vitest": "5.1.0"
+  }
+}
