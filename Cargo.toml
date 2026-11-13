@@ -26,7 +26,7 @@ uuid = { version = "=1.29.2", features = ["v4"] }
 chrono = { version = "=0.4.45", features = ["serde"] }
 reqwest = { version = "=0.13.5", features = ["json", "multipart"] }
 
-rquickjs = "=0.13.0"
+rquickjs = "=0.14.0"
 
 [profile.release]
 lto = true
