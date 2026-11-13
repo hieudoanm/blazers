@@ -13,14 +13,16 @@ Inspired by PocketBase and Supabase; see the feature comparison in
 
 ## Repository layout
 
-| Path                        | What it is                                                                                                                                      |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `crates/blazers-core`       | Storage layer: `db/` (schema, migrations, all SQL, split by domain) + `models/` (wire types, `AppError`, split by domain). See `crates/blazers-core/AGENTS.md`.               |
-| `crates/blazers-server`     | Everything HTTP: feature modules + `app.rs` (router, embedded dashboard via `rust-embed`, `serve_http`). See `crates/blazers-server/AGENTS.md`. |
-| `crates/blazers-mcp`        | MCP stdio server (newline-delimited JSON-RPC 2.0) exposing the DB as tools. See `crates/blazers-mcp/AGENTS.md`.                                 |
-| `crates/blazers`            | Thin binary: `blazers` / `blazers serve` → HTTP, `blazers mcp serve` → MCP.                                                                     |
-| `packages/landing`          | Next.js + Tailwind landing page **and** docs site (`/docs/*`) → GitHub Pages. See `packages/landing/AGENTS.md`.                                |
-| `.github/workflows/ci.yaml` | Pages deploy + release binary jobs.                                                                                                             |
+| Path                        | What it is                                                                                                                                                      |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `crates/blazers-core`       | Storage layer: `db/` (schema, migrations, all SQL, split by domain) + `models/` (wire types, `AppError`, split by domain). See `crates/blazers-core/AGENTS.md`. |
+| `crates/blazers-server`     | Everything HTTP: feature modules + `app.rs` (router, embedded dashboard via `rust-embed`, `serve_http`). See `crates/blazers-server/AGENTS.md`.                 |
+| `crates/blazers-mcp`        | MCP stdio server (newline-delimited JSON-RPC 2.0) exposing the DB as tools. See `crates/blazers-mcp/AGENTS.md`.                                                 |
+| `crates/blazers`            | Thin binary: `blazers` / `blazers serve` → HTTP, `blazers mcp serve` → MCP.                                                                                     |
+| `packages/landing`          | Next.js + Tailwind landing page **and** docs site (`/docs/*`) → GitHub Pages. See `packages/landing/AGENTS.md`.                                                 |
+| `packages/sdk`              | `@blazers/sdk` — dependency-free TypeScript client SDK: auth, records, files, realtime, batch. `npm run build` → `dist/`, `npm test`. See `packages/sdk/AGENTS.md`. |
+| `packages/app`              | `@blazers/app` — live demo SPA (Next.js + Tailwind + DaisyUI) exercising the SDK via `workspace:*`. `npm run dev` → :3001. See `packages/app/AGENTS.md`.          |
+| `.github/workflows/ci.yaml` | Pages deploy + release binary jobs.                                                                                                                             |
 
 ## Commands
 
@@ -30,6 +32,18 @@ cargo test --workspace           # all tests (unit + integration)
 cargo clippy --workspace --all-targets -- -D warnings
 cargo fmt --all
 make all                         # fmt-check + clippy + test + release build
+```
+
+JS workspace (`packages/{landing,sdk,app}` — pnpm + Turborepo):
+
+```bash
+pnpm install        # workspace install (never npm install — pnpm manages it)
+pnpm dev            # turbo run dev → landing :3000 + app :3001
+pnpm build          # turbo run build (sdk dist + both Next apps)
+pnpm lint           # turbo run lint
+pnpm test           # turbo run test (vitest)
+pnpm typecheck      # turbo run typecheck
+pnpm format         # turbo run format (prettier --write)
 ```
 
 Run locally: `cargo run -p blazers -- serve` (or `./target/release/blazers`).

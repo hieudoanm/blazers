@@ -32,12 +32,12 @@ Operators: `=`, `!=`, `>`, `>=`, `<`, `<=`, `~`/`!~` (case-insensitive
 contains), `&&`, `||`, `!`, parentheses. Literals: `'str'`, numbers,
 `true`/`false`/`null`. Dot paths reach nested objects (`author.role`).
 
-**`sort`** — `field,-other`: `-` prefix = descending; missing values sort
-last. e.g. `sort=-created,title`.
+**`sort`** — `field,-other`: `-` prefix = descending; missing values sort last.
+e.g. `sort=-created,title`.
 
-**`expand`** — fetches related records. A field whose value is
-`"collection:id"` (or a bare id when a collection shares the field name) is
-expanded into `data.expand_<field>` with the target record.
+**`expand`** — fetches related records. A field whose value is `"collection:id"`
+(or a bare id when a collection shares the field name) is expanded into
+`data.expand_<field>` with the target record.
 
 **Response `200`**
 

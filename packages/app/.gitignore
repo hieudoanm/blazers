@@ -1,0 +1,8 @@
+node_modules
+.next
+out
+coverage
+*.tsbuildinfo
+.DS_Store
+next-env.d.ts
+.blazers-data

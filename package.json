@@ -1,0 +1,29 @@
+{
+  "name": "@blazers/workspace",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Blazers — single-binary BaaS (Rust) plus TypeScript SDK, demo app and landing/docs site",
+  "license": "MIT",
+  "author": {
+    "name": "Hieu Doan",
+    "email": "hieu.doan.professional@gmail.com",
+    "url": "https://hieudoanm.github.io"
+  },
+  "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": "26.13.1"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "format": "turbo run format",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "husky": "9.1.7",
+    "turbo": "2.11.11"
+  }
+}

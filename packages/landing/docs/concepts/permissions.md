@@ -69,17 +69,19 @@ expressions — `list_rule`, `view_rule`, `create_rule`, `update_rule`,
 `delete_rule` — set via `PATCH /api/collections/{name}`:
 
 ```json
-{ "list_rule": "status = 'published' || owner = @request.auth.id",
-  "create_rule": "@request.auth.verified = true" }
+{
+  "list_rule": "status = 'published' || owner = @request.auth.id",
+  "create_rule": "@request.auth.verified = true"
+}
 ```
 
 - Empty rule = allow everyone (subject to RBAC).
 - `admin` role bypasses rules entirely.
 - Expressions use the same syntax as the `?filter=` query param — see
   [Records API](../api-reference/records.md#list-records-with-filter-sort-expand-and-pagination)
-  for operators. `@request.auth.*` resolves to the caller's user record
-  (`id`, `email`, `verified`, plus custom `data` fields); `@request.data.*`
-  resolves to the record being written.
+  for operators. `@request.auth.*` resolves to the caller's user record (`id`,
+  `email`, `verified`, plus custom `data` fields); `@request.data.*` resolves to
+  the record being written.
 - `list_rule` is ANDed with the client's `?filter=` **before** pagination;
   `view`/`update`/`delete` rules evaluate per record; `create_rule` also runs
   against the merged record on update.

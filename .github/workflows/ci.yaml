@@ -15,6 +15,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  app-check:
+    name: App check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.1
+        with:
+          version: 12.18.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      # `@blazers/app...` selects the app plus its workspace deps (@blazers/sdk),
+      # so the SDK is built before the app's typecheck/build consume dist/.
+      - name: Build app + sdk
+        run: pnpm exec turbo run build --filter=@blazers/app...
+
+      - name: Lint app + sdk
+        run: pnpm exec turbo run lint --filter=@blazers/app...
+
+      - name: Typecheck app + sdk
+        run: pnpm exec turbo run typecheck --filter=@blazers/app...
+
+      - name: Test app + sdk
+        run: pnpm exec turbo run test --filter=@blazers/app...
+
   cli-check:
     name: CLI check
     runs-on: ubuntu-latest
@@ -42,84 +79,6 @@ jobs:
 
       - name: Run Rust tests
         run: cargo test --workspace
-
-  landing-build:
-    name: Landing - Build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7.0.1
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6.1.1
-        with:
-          version: 12.18.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-          cache-dependency-path: packages/landing/pnpm-lock.yaml
-
-      - name: Install landing dependencies
-        working-directory: packages/landing
-        run: pnpm install --frozen-lockfile
-
-      - name: Typecheck landing
-        working-directory: packages/landing
-        run: pnpm run typecheck
-
-      - name: Lint landing
-        working-directory: packages/landing
-        run: pnpm run lint
-
-      - name: Test landing
-        working-directory: packages/landing
-        run: pnpm run test
-
-      - name: Build landing (Next.js static export)
-        working-directory: packages/landing
-        run: pnpm run build
-
-      - name: Delete stale Pages artifacts
-        uses: actions/github-script@v9.0.0
-        with:
-          script: |
-            const { data } = await github.rest.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId,
-            });
-            for (const artifact of data.artifacts.filter((a) => a.name === "github-pages" && !a.expired)) {
-              await github.rest.actions.deleteArtifact({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                artifact_id: artifact.id,
-              });
-            }
-
-      - name: Upload landing artifact
-        if: github.ref == 'refs/heads/master'
-        uses: actions/upload-pages-artifact@v5.0.0
-        with:
-          path: packages/landing/out
-
-  landing-deploy:
-    name: Landing - Deploy
-    needs: landing-build
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    steps:
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v5.0.1
 
   cli-build:
     name: CLI build (${{ matrix.os }})
@@ -164,6 +123,79 @@ jobs:
           path: blazers-*
           if-no-files-found: error
           retention-days: 7
+
+  landing-build:
+    name: Landing - Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.1
+        with:
+          version: 12.18.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck landing
+        run: pnpm --filter blazers-landing run typecheck
+
+      - name: Lint landing
+        run: pnpm --filter blazers-landing run lint
+
+      - name: Test landing
+        run: pnpm --filter blazers-landing run test
+
+      - name: Build landing (Next.js static export)
+        run: pnpm --filter blazers-landing run build
+
+      - name: Delete stale Pages artifacts
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+            for (const artifact of data.artifacts.filter((a) => a.name === "github-pages" && !a.expired)) {
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id,
+              });
+            }
+
+      - name: Upload landing artifact
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: packages/landing/out
+
+  landing-deploy:
+    name: Landing - Deploy
+    needs: landing-build
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v5.0.1
 
   release:
     name: Release
