@@ -8,6 +8,15 @@ const REPO_BLOB = 'https://github.com/hieudoanm/blazers/blob/main';
 // Used in raw HTML hrefs, so basePath is not applied automatically.
 const BASE_PATH = process.env.NODE_ENV === 'production' ? '/blazers' : '';
 
+export interface DocHeading {
+  /** Anchor id added by addHeadingIds */
+  id: string;
+  /** Heading text with HTML tags stripped */
+  text: string;
+  /** Heading level 1–6 */
+  level: number;
+}
+
 export interface DocPage {
   /** URL slug, e.g. "concepts/architecture"; "" for docs/README.md */
   slug: string;
@@ -17,6 +26,8 @@ export interface DocPage {
   section: string;
   /** Rendered HTML */
   html: string;
+  /** h2+ headings for the "On this page" TOC */
+  toc: DocHeading[];
 }
 
 const walk = (dir: string, prefix: string, out: string[]): void => {
@@ -118,6 +129,21 @@ const frameSvgs = (html: string): string => {
   });
 };
 
+/** Pull h2+ headings (with their ids) out of rendered HTML for the TOC. */
+const extractToc = (html: string): DocHeading[] => {
+  const toc: DocHeading[] = [];
+  for (const m of html.matchAll(/<h([1-6]) id="([^"]*)">([\s\S]*?)<\/h\1>/g)) {
+    const level = Number(m[1]);
+    if (level < 2) continue;
+    toc.push({
+      level,
+      id: m[2],
+      text: m[3].replace(/<[^>]+>/g, ''),
+    });
+  }
+  return toc;
+};
+
 export const getDocPages = (): DocPage[] => {
   const files: string[] = [];
   walk(DOCS_DIR, '', files);
@@ -127,11 +153,13 @@ export const getDocPages = (): DocPage[] => {
     const markdown = readFileSync(path.join(DOCS_DIR, file), 'utf8');
     const raw = marked.parse(markdown, { async: false }) as string;
     const section = slug.split('/')[0] ?? '';
+    const html = frameSvgs(addHeadingIds(rewriteLinks(raw, slug)));
     return {
       slug,
       title: titleFor(markdown, file),
       section,
-      html: frameSvgs(addHeadingIds(rewriteLinks(raw, slug))),
+      html,
+      toc: extractToc(html),
     };
   });
 };
@@ -141,6 +169,7 @@ export const DOC_SECTIONS: { id: string; label: string }[] = [
   { id: 'concepts', label: 'Concepts' },
   { id: 'api-reference', label: 'API reference' },
   { id: 'guides', label: 'Guides' },
+  { id: 'deployment', label: 'Deployment' },
 ];
 
 export const sectionLabel = (id: string): string => {

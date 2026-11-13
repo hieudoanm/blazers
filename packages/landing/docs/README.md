@@ -10,7 +10,9 @@ This documentation is organized like the
 - **Getting started** — install, configure, and make your first API call.
 - **Concepts** — how each subsystem works and when to use it.
 - **API reference** — every REST endpoint, request/response shapes, and errors.
-- **Guides** — the admin dashboard, MCP server, and deployment.
+- **Guides** — the admin dashboard and MCP server.
+- **Deployment** — platform-specific setup: Docker, Render, Heroku, AWS, Azure,
+  GCP and Terraform.
 
 The machine-readable spec is always available from a running server:
 
@@ -62,4 +64,23 @@ The machine-readable spec is always available from a running server:
 
 - [Admin dashboard](guides/admin-dashboard.md)
 - [MCP server](guides/mcp-server.md)
-- [Deployment](guides/deployment.md)
+
+### Deployment
+
+- [Overview](deployment.md)
+
+**with-\*** — run it yourself
+
+- [Docker](deployment/with-docker.md)
+- [Terraform](deployment/with-terraform.md)
+
+**paas-\*** — platform-as-a-service
+
+- [Render](deployment/paas-render.md)
+- [Heroku](deployment/paas-heroku.md)
+
+**iaas-\*** — infrastructure-as-a-service
+
+- [AWS](deployment/iaas-aws.md)
+- [Azure](deployment/iaas-azure.md)
+- [GCP](deployment/iaas-gcp.md)

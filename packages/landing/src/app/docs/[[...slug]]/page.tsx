@@ -1,13 +1,8 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { DOC_SECTIONS, getDocPages, type DocPage } from '@/lib/docs';
 import type { JSX } from 'react';
-
-// next/image with unoptimized does not apply basePath — mirror next.config.ts.
-const LOGO =
-  process.env.NODE_ENV === 'production' ? '/blazers/logo.svg' : '/logo.svg';
 
 export const generateStaticParams = () =>
   getDocPages().map((p) => ({
@@ -40,45 +35,9 @@ const DocsPage = async ({ params }: DocsPageProps): Promise<JSX.Element> => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-lg font-bold text-gray-900 no-underline">
-            <Image
-              src={LOGO}
-              alt=""
-              width={28}
-              height={28}
-              className="rounded-md"
-            />
-            <span>blazers</span>
-          </Link>
-          <nav className="ml-auto flex items-center gap-5 text-sm">
-            <Link
-              href="/"
-              className="text-gray-500 no-underline hover:text-gray-900">
-              Home
-            </Link>
-            <Link
-              href="/docs/"
-              className="text-primary font-semibold no-underline">
-              Docs
-            </Link>
-            <Link
-              href="https://github.com/hieudoanm/blazers"
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-primary btn-sm">
-              GitHub
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      <div className="mx-auto w-full max-w-6xl px-5 py-10">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-[16rem_1fr]">
-          <aside className="hidden md:block">
+      <div className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-6xl flex-col px-5 py-10">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-10 md:grid-cols-[16rem_1fr]">
+          <aside className="hidden min-h-0 overflow-y-auto md:block">
             <Link
               href="/docs/"
               className="text-sm font-bold text-gray-900 no-underline">
@@ -112,11 +71,33 @@ const DocsPage = async ({ params }: DocsPageProps): Promise<JSX.Element> => {
             })}
           </aside>
 
-          <article>
-            <div
-              className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: doc.html }}
-            />
+          <article className="min-h-0 overflow-y-auto">
+            <div className="grid grid-cols-1 gap-8 pb-4 lg:grid-cols-[minmax(0,1fr)_11rem] lg:gap-10">
+              {doc.toc.length > 0 && (
+                <nav
+                  aria-label="On this page"
+                  className="self-start lg:sticky lg:top-0 lg:order-2 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto">
+                  <p className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
+                    On this page
+                  </p>
+                  <ul className="border-base-content/10 mt-2 space-y-1">
+                    {doc.toc.map((h) => (
+                      <li key={h.id} className={h.level > 2 ? 'pl-4' : ''}>
+                        <a
+                          href={`#${h.id}`}
+                          className="text-base-content/60 hover:text-primary block py-0.5 text-sm transition-colors">
+                          {h.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              )}
+              <div
+                className="prose max-w-none lg:order-1"
+                dangerouslySetInnerHTML={{ __html: doc.html }}
+              />
+            </div>
           </article>
         </div>
       </div>

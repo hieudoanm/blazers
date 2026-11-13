@@ -11,9 +11,9 @@ const GITHUB = 'https://github.com/hieudoanm/blazers';
 const LOGO =
   process.env.NODE_ENV === 'production' ? '/blazers/logo.svg' : '/logo.svg';
 const NAV_LINKS = [
-  { label: 'Features', href: '#features' },
-  { label: 'Versus', href: '#compare' },
-  { label: 'Quickstart', href: '#quickstart' },
+  { label: 'Features', href: '/#features' },
+  { label: 'Versus', href: '/#compare' },
+  { label: 'Quickstart', href: '/#quickstart' },
   { label: 'Docs', href: '/docs/' },
 ];
 

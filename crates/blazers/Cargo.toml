@@ -3,6 +3,7 @@ name = "blazers"
 description = "Blazers - blazing fast Back-end as a Service in a single binary"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 

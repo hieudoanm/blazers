@@ -1,0 +1,12 @@
+.git
+.github
+target
+**/node_modules
+**/.next
+**/out
+packages
+browsers
+*.md
+!README.md
+Dockerfile
+.dockerignore

@@ -3,6 +3,7 @@ name = "blazers-mcp"
 description = "Blazers MCP server: expose collections and records as MCP tools over stdio"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 

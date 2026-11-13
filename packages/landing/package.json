@@ -1,5 +1,5 @@
 {
-  "name": "blazers-landing",
+  "name": "@blazers/landing",
   "version": "0.0.1",
   "private": true,
   "packageManager": "pnpm@12.18.0",

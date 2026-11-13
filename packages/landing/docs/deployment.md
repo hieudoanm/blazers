@@ -1,8 +1,28 @@
 # Deployment
 
-Blazers is designed to run anywhere a single static binary runs — a VPS, a
-container, a Raspberry Pi, or a CI job. There is no external service to
-provision.
+Blazers is designed to run anywhere a single static binary or container runs — a
+VPS, a container platform, a Raspberry Pi, or a CI job. There is no external
+service to provision.
+
+## Platform guides
+
+Step-by-step setup for each target:
+
+**with-\*** — run it yourself
+
+- [Docker](deployment/with-docker.md) — image, Compose, volumes, env vars
+- [Terraform](deployment/with-terraform.md) — AWS, Azure and GCP as code
+
+**paas-\*** — platform-as-a-service
+
+- [Render](deployment/paas-render.md) — blueprint + persistent disks
+- [Heroku](deployment/paas-heroku.md) — container stack (ephemeral disk caveat)
+
+**iaas-\*** — infrastructure-as-a-service
+
+- [AWS](deployment/iaas-aws.md) — ECS Fargate + EFS, or EC2
+- [Azure](deployment/iaas-azure.md) — Container Apps + Azure Files
+- [GCP](deployment/iaas-gcp.md) — Compute Engine, or Cloud Run (ephemeral)
 
 ## Minimal deploy
 
@@ -19,20 +39,6 @@ That's it. The server:
 - generates the secrets-vault key inside `BLAZERS_DATA`
 - serves the API, admin dashboard (`/`), OpenAPI (`/api/docs`), and all realtime
   streams on `PORT`
-
-## Docker
-
-```dockerfile
-FROM debian:bookworm-slim
-COPY blazers /usr/local/bin/blazers
-ENV BLAZERS_DATA=/data JWT_SECRET=change-me PORT=8080
-VOLUME /data
-EXPOSE 8080
-CMD ["blazers", "serve"]
-```
-
-Mount `/data` as a volume — it holds the database, uploaded files, and the
-secrets key.
 
 ## systemd unit
 

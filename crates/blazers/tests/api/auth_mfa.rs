@@ -1,12 +1,14 @@
 use super::*;
-use totp_rs::{Algorithm, Secret, TOTP};
+use totp_rs::{Builder, Secret};
 
 fn current_code(secret_b32: &str) -> String {
-    let bytes = Secret::Encoded(secret_b32.to_string()).to_bytes().unwrap();
-    TOTP::new(Algorithm::SHA1, 6, 1, 30, bytes)
+    let secret = Secret::try_from_base32(secret_b32).unwrap();
+    Builder::new()
+        .with_secret(secret)
+        .build()
         .unwrap()
         .generate_current()
-        .unwrap()
+        .to_string()
 }
 
 #[tokio::test]

@@ -5,25 +5,23 @@
 use axum::{Json, extract::State, http::HeaderMap};
 use serde::Deserialize;
 use serde_json::Value;
-use totp_rs::{Algorithm, Secret, TOTP};
+use totp_rs::{Builder, Secret, Totp};
 
 use super::*;
 use crate::auth::{self, Claims};
 
-fn totp_for(secret_b32: &str) -> std::result::Result<TOTP, AppError> {
-    let bytes = Secret::Encoded(secret_b32.to_string())
-        .to_bytes()
+fn totp_for(secret_b32: &str) -> std::result::Result<Totp, AppError> {
+    let secret = Secret::try_from_base32(secret_b32)
         .map_err(|e| AppError::Internal(format!("mfa secret: {e}")))?;
-    TOTP::new(Algorithm::SHA1, 6, 1, 30, bytes)
+    Builder::new()
+        .with_secret(secret)
+        .build()
         .map_err(|e| AppError::Internal(format!("mfa totp: {e}")))
 }
 
 fn check_code(secret_b32: &str, _email: &str, code: &str) -> bool {
     totp_for(secret_b32)
-        .and_then(|t| {
-            t.check_current(code)
-                .map_err(|e| AppError::Internal(e.to_string()))
-        })
+        .map(|t| t.check_current(code).is_some())
         .unwrap_or(false)
 }
 
@@ -48,9 +46,7 @@ pub async fn mfa_enable(
     if user.mfa_enabled {
         return Err(AppError::BadRequest("mfa already enabled".into()));
     }
-    let Secret::Encoded(b32) = Secret::generate_secret().to_encoded() else {
-        return Err(AppError::Internal("mfa secret encode failed".into()));
-    };
+    let b32 = Secret::generate().to_base32();
     let conn = state
         .db
         .get()

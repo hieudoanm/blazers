@@ -53,6 +53,16 @@ cargo build --release
 # → http://localhost:8080  (admin dashboard at /, API docs at /api/docs)
 ```
 
+Or with Docker (prebuilt image, or `docker build -t blazers .` from source):
+
+```bash
+docker run -d -p 8080:8080 \
+  -e JWT_SECRET="$(openssl rand -hex 32)" \
+  -v blazers-data:/data \
+  ghcr.io/hieudoanm/blazers:latest
+# → http://localhost:8080
+```
+
 ```bash
 curl -X POST localhost:8080/api/auth/register \
   -H 'Content-Type: application/json' \
