@@ -25,7 +25,7 @@
     "test": "vitest run"
   },
   "engines": {
-    "node": ">=18"
+    "node": "v26.13.1"
   },
   "license": "MIT",
   "devDependencies": {
