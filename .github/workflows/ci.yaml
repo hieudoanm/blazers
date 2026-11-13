@@ -150,16 +150,16 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Typecheck landing
-        run: pnpm --filter blazers-landing run typecheck
+        run: pnpm --filter @blazers/landing run typecheck
 
       - name: Lint landing
-        run: pnpm --filter blazers-landing run lint
+        run: pnpm --filter @blazers/landing run lint
 
       - name: Test landing
-        run: pnpm --filter blazers-landing run test
+        run: pnpm --filter @blazers/landing run test
 
       - name: Build landing (Next.js static export)
-        run: pnpm --filter blazers-landing run build
+        run: pnpm --filter @blazers/landing run build
 
       - name: Delete stale Pages artifacts
         uses: actions/github-script@v9.0.0
