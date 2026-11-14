@@ -72,7 +72,8 @@ fn test_token() -> String {
             std::env::var("JWT_SECRET")
                 .unwrap_or_else(|_| "dev-secret-change-in-production".into())
                 .as_bytes(),
-        ),
+        )
+        .unwrap(),
     )
     .unwrap()
 }

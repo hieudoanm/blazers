@@ -79,20 +79,15 @@ fn generate_token(
         exp: now + 72 * 3600,
         iat: now,
     };
-    encode(
-        &Header::default(),
-        &claims,
-        &EncodingKey::from_secret(jwt_secret().as_bytes()),
-    )
+    let key = EncodingKey::from_secret(jwt_secret().as_bytes())?;
+    encode(&Header::default(), &claims, &key)
 }
 
 pub fn validate_token(token_str: &str) -> std::result::Result<Claims, AppError> {
-    let token = decode::<Claims>(
-        token_str,
-        &DecodingKey::from_secret(jwt_secret().as_bytes()),
-        &Validation::default(),
-    )
-    .map_err(|_| AppError::Unauthorized("invalid token".into()))?;
+    let key = DecodingKey::from_secret(jwt_secret().as_bytes())
+        .map_err(|e| AppError::Internal(format!("jwt key: {e}")))?;
+    let token = decode::<Claims>(token_str, &key, &Validation::default())
+        .map_err(|_| AppError::Unauthorized("invalid token".into()))?;
     Ok(token.claims)
 }
 
@@ -112,22 +107,18 @@ pub fn generate_file_token(file_id: &str, ttl_secs: usize) -> String {
         exp: now + ttl_secs,
         iat: now,
     };
-    encode(
-        &Header::default(),
-        &claims,
-        &EncodingKey::from_secret(jwt_secret().as_bytes()),
-    )
-    .unwrap_or_default()
+    let Ok(key) = EncodingKey::from_secret(jwt_secret().as_bytes()) else {
+        return String::new();
+    };
+    encode(&Header::default(), &claims, &key).unwrap_or_default()
 }
 
 /// Validates a file token and returns the file id it was issued for.
 pub fn validate_file_token(token_str: &str) -> std::result::Result<String, AppError> {
-    let token = decode::<FileTokenClaims>(
-        token_str,
-        &DecodingKey::from_secret(jwt_secret().as_bytes()),
-        &Validation::default(),
-    )
-    .map_err(|_| AppError::Unauthorized("invalid file token".into()))?;
+    let key = DecodingKey::from_secret(jwt_secret().as_bytes())
+        .map_err(|e| AppError::Internal(format!("jwt key: {e}")))?;
+    let token = decode::<FileTokenClaims>(token_str, &key, &Validation::default())
+        .map_err(|_| AppError::Unauthorized("invalid file token".into()))?;
     Ok(token.claims.file_id)
 }
 

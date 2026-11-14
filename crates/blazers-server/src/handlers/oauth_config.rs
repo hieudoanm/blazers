@@ -115,22 +115,17 @@ pub(crate) fn make_state(provider: &str) -> Result<String> {
         exp: now + 600,
         iat: now,
     };
-    encode(
-        &Header::default(),
-        &claims,
-        &EncodingKey::from_secret(state_secret().as_bytes()),
-    )
-    .map_err(|e| AppError::Internal(format!("state: {e}")))
+    let key = EncodingKey::from_secret(state_secret().as_bytes())
+        .map_err(|e| AppError::Internal(format!("state key: {e}")))?;
+    encode(&Header::default(), &claims, &key).map_err(|e| AppError::Internal(format!("state: {e}")))
 }
 
 pub(crate) fn check_state(token: &str, provider: &str) -> Result<()> {
-    let claims = decode::<OAuthState>(
-        token,
-        &DecodingKey::from_secret(state_secret().as_bytes()),
-        &Validation::default(),
-    )
-    .map_err(|_| AppError::BadRequest("invalid oauth state".into()))?
-    .claims;
+    let key = DecodingKey::from_secret(state_secret().as_bytes())
+        .map_err(|e| AppError::Internal(format!("state key: {e}")))?;
+    let claims = decode::<OAuthState>(token, &key, &Validation::default())
+        .map_err(|_| AppError::BadRequest("invalid oauth state".into()))?
+        .claims;
     if claims.purpose != "oauth" || claims.provider != provider {
         return Err(AppError::BadRequest("invalid oauth state".into()));
     }
